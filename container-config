@@ -1,0 +1,5 @@
+#Registry JSON file to run
+registry_json=/home/registry-json
+
+#Whether to output registry output to a log inside container
+log_registry=FALSE
