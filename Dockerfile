@@ -4,7 +4,7 @@ ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     g++ build-essential openssl libssl-dev unzip git wget dbus avahi-daemon libavahi-compat-libdnssd-dev \
-    zlib1g-dev gnupg curl ca-certificates nano && \
+    zlib1g-dev gnupg curl ca-certificates nano libnss-mdns && \
     curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
     echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
     apt-get update && apt-get install -y --no-install-recommends yarn nodejs && \
@@ -95,7 +95,7 @@ RUN cd /home/certs && mkdir run-certs && ./generateCerts registration1 nmos.tv q
 
 ## Create relevant configuration files for Sony Registry and Node
 
-RUN cd /home/ && mkdir example-conf && mkdir admin
+RUN cd /home/ && mkdir example-conf && mkdir admin && mkdir admin/router
 ADD example-conf /home/example-conf
 
 ## Get and build source for Sony nmos-js
@@ -106,12 +106,20 @@ RUN cd /home/ && git init && git config --global http.sslVerify false && \
     yarn build && \
     cp -rf /home/nmos-js/Development/build/* /home/admin
 
+## Get and build source for BBC nmos-web-router
+#RUN cd /home/ && git init && git config --global http.sslVerify false && \
+#    git clone https://github.com/bbc/nmos-web-router && \
+#    cd /home/nmos-web-router/ && \
+#    yarn install && \
+#    yarn build && \
+#    cp -rf /home/nmos-web-router/build/* /home/admin/router
+
 ## Move executables, libraries and clean up container as much as possible
 RUN cd /home/nmos-cpp/Development/build && \
     cp nmos-cpp-node nmos-cpp-registry nmos-cpp-test /home && \
     cp /home/boost_1_69_0/stage/lib/* /usr/local/lib && \
     cd /home/cmake-3.15.2 && make uninstall && \
-    cd /home && rm -rf .git cmake-3.15.2 mDNSResponder-878.30.4 boost_1_69_0 cpprestsdk-2.10.14 nmos-cpp nmos-js && \
+    cd /home && rm -rf .git cmake-3.15.2 mDNSResponder-878.30.4 boost_1_69_0 cpprestsdk-2.10.14 nmos-cpp nmos-js nmos-web-router && \
     apt-get remove g++ build-essential unzip git wget yarn ca-certificates nodejs gnupg curl -y --no-install-recommends && \
     apt-get autoclean -y && \
     apt-get autoremove -y && \

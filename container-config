@@ -3,3 +3,6 @@ registry_json=/home/registry-json
 
 #Whether to output registry output to a log inside container
 log_registry=FALSE
+
+#Whether to update label parameter with container hostname on entrypoint script run
+update_label=TRUE

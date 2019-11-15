@@ -60,13 +60,19 @@ do_params
 /etc/init.d/dbus start
 /etc/init.d/avahi-daemon start
 
-#Add .local address to hosts file to allow internal ran Node implementation to
-#correctly achieve a DNS Lookup for the Registry
+# Adjust registry-json to update/add "label" with relevant "$(hostname)" data
 
-echo -ne "\n#Added to resolve DNS resolution for Node implementation\n\
-127.0.0.1      "$(hostname)".local.\n" >> /etc/hosts
+if cfg_haskey update_label && [ "$(cfg_read update_label)" = "TRUE" ]; then
+    if grep "label" /home/registry-json; then
+        echo "Replacing label: with $(hostname) hostname in registry-json file"
+        sed -i.bak "s/\(\"label\":\)[^,]*,/\"label\": \"$(hostname)\",/g" registry-json
+    else
+        echo "Inserting label: with $(hostname) hostname in registry-json file"
+        sed -i.bak "$(( $( wc -l < registry-json) -2 ))s/$/\n\"label\": \"$(hostname)\",/" registry-json
+    fi
+fi
 
-# Start Sony Registry Application inside correct directory
+# Start Sony Registry Application inside correct directory with logging on or off
 sleep 1
 
 if cfg_haskey log_registry && [ "$(cfg_read log_registry)" = "TRUE" ]; then  
