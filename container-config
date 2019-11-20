@@ -1,8 +1,13 @@
 #Registry JSON file to run
 registry_json=/home/registry-json
 
-#Whether to output registry output to a log inside container
+#Output registry stdout/stderr output to a log inside container
 log_registry=FALSE
 
-#Whether to update label parameter with container hostname on entrypoint script run
+#Update/insert label parameter with container hostname on entrypoint script run
 update_label=TRUE
+
+#Retrive switch PTP BC Domain and update/insert it for AMWA IS-09 NMOS System API
+update_ptp_domain=TRUE
+switch_username=admin
+switch_password=admin

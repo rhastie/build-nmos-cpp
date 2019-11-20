@@ -1,4 +1,4 @@
-FROM ubuntu:disco
+FROM ubuntu:disco as stage1-build
 
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
 
@@ -118,19 +118,35 @@ RUN cd /home/ && git init && git config --global http.sslVerify false && \
 RUN cd /home/nmos-cpp/Development/build && \
     cp nmos-cpp-node nmos-cpp-registry nmos-cpp-test /home && \
     cp /home/boost_1_69_0/stage/lib/* /usr/local/lib && \
-    cd /home/cmake-3.15.2 && make uninstall && \
-    cd /home && rm -rf .git cmake-3.15.2 mDNSResponder-878.30.4 boost_1_69_0 cpprestsdk-2.10.14 nmos-cpp nmos-js nmos-web-router && \
-    apt-get remove g++ build-essential unzip git wget yarn ca-certificates nodejs gnupg curl -y --no-install-recommends && \
-    apt-get autoclean -y && \
-    apt-get autoremove -y && \
-    rm -rf /var/lib/apt/lists/* && \
-    rm -rf /usr/share/doc/ && rm -rf /usr/share/man/ && rm -rf /usr/share/locale/ && \
-    rm -rf /usr/local/share/man/* && rm -rf /usr/local/share/.cache/* && rm -rf /usr/local/share/cmake-3.15/*
+#    cd /home/cmake-3.15.2 && make uninstall && \
+    cd /home && rm -rf .git cmake-3.15.2 mDNSResponder-878.30.4 boost_1_69_0 cpprestsdk-2.10.14 nmos-cpp nmos-js nmos-web-router
+#    apt-get remove g++ build-essential unzip git wget yarn ca-certificates nodejs gnupg curl -y --no-install-recommends && \
+#    apt-get autoclean -y && \
+#    apt-get autoremove -y && \
+#    rm -rf /var/lib/apt/lists/* && \
+#    rm -rf /usr/share/doc/ && rm -rf /usr/share/man/ && rm -rf /usr/share/locale/ && \
+#    rm -rf /usr/local/share/man/* && rm -rf /usr/local/share/.cache/* && rm -rf /usr/local/share/cmake-3.15/*
 
-## Add Entrypoint.sh script and configuration files to make container executable
+## Re-build container for optimised runtime environment using clean Ubuntu Disco release
+
+FROM ubuntu:disco
+
+#Update container with latest patches and needed packages
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    openssl libssl-dev dbus avahi-daemon libavahi-compat-libdnssd-dev \
+    zlib1g-dev nano libnss-mdns curl jq && \
+    rm -rf /var/lib/apt/lists/* && \
+    apt-get clean -y --no-install-recommends && \
+    apt-get autoclean -y --no-install-recommends
+
+#Copy required files and entrypoint.sh script to image
+COPY --from=stage1-build /home /home
+COPY --from=stage1-build /usr/local/lib /usr/local/lib
 COPY entrypoint.sh container-config registry-json /home/
+
+#Set script to executable
 RUN chmod +x /home/entrypoint.sh
 
-#WORKDIR /home/
-#ENTRYPOINT ["/home/entrypoint.sh"]
-#CMD []
+WORKDIR /home/
+ENTRYPOINT ["/home/entrypoint.sh"]
+CMD []
