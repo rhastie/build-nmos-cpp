@@ -1,6 +1,6 @@
 {
 "pri": 10,
-"logging_level": -40,
+"logging_level": -10,
 "allow_invalid_resources": false,
 "label": "mellanox_container",
 "http_port": 8010,
