@@ -86,7 +86,7 @@ if cfg_haskey update_ptp_domain && [ "$(cfg_read update_ptp_domain)" = "TRUE" ];
 
             # Recover PTP domain number from JSON output
 
-            ptp_domain=$(jq -r '.data[].Domain' /home/ptp_data)
+            ptp_domain=$(jq -r '.data[0].Domain' /home/ptp_data)
             echo -e "BC PTP Domain on Mellanox Switch is set to: $ptp_domain"
 
             echo -e "Insert/Replace ptp_domain_number: with $ptp_domain in $registry_json file"
@@ -118,7 +118,8 @@ echo -e "\nStarting dbus and avahi services"
 # Start Sony Registry Application inside correct directory with logging on or off
 sleep 1
 
-echo -e "\nStarting Sony Registry Application"
+echo -e "\nStarting Sony Registry Application with following congfig"
+cat $registry_json
 if cfg_haskey log_registry && [ "$(cfg_read log_registry)" = "TRUE" ]; then
     echo -e "\nStarting with Logging enabled"
     /home/nmos-cpp-registry $registry_json >>/home/logreg-err.txt 2>/home/logreg-out.txt
