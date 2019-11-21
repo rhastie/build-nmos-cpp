@@ -24,7 +24,7 @@ Additionally it supports the following additional components:
  - Supports an embedded NMOS Browser Client
  - Supports a DNS-SD Bridge to HTML implementation 
 
-The nmos-cpp container includes implementations of the NMOS Node, Registration and Query APIs, and the NMOS Connection API. It also included a NMOS Client in JavaScript and DNS-SD API which aren't part of the specifications.
+The nmos-cpp container includes implementations of the NMOS Node, Registration and Query APIs, and the NMOS Connection API. It also included a NMOS Client in JavaScript and a DNS-SD API which aren't part of the specifications.
 
 ## How to install and run the container
 ### On a Mellanox Switch running Onyx NOS
@@ -62,4 +62,3 @@ The container publsihed on all available IP addresses using port 8010
 - Make sure you have a fully function Docker CE environment. It is recommended you follow these instructions for Ubuntu: https://docs.docker.com/v17.09/engine/installation/linux/docker-ce/ubuntu/ 
 - Clone the repository to your host
 - Run "sudo make build"
-
