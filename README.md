@@ -2,11 +2,12 @@
 ## Implementation Overview
 This repository contains all the Docker files needed for an implementation of the AMWA Networked Media Open Specifications. For more information about AMWA, NMOS and the Networked Media Incubator, please refer to http://amwa.tv/.
 
+This work is principally based on the open-sourced implementation from Sony. Please see: http://github.com/sony/nmos-cpp
+
 The resulting Docker Container is specifically optimised to operate on a Mellanox switch, but can also function independently on a standard host. Please see overview presentation from the IP Showcase @ IBC 2019:
 
 - Video here: https://youtu.be/MXbepL2lmK4
 - Slides here: http://www.ipshowcase.org/wp-content/uploads/2019/10/1500-Simplifying-JT-NM-TR-1001-1-Deployments-through-Microservices.pdf 
-
 
 Specifically the implementation supports the following specifications:
 
@@ -26,12 +27,13 @@ Additionally it supports the following additional components:
 The nmos-cpp container includes implementations of the NMOS Node, Registration and Query APIs, and the NMOS Connection API. It also included a NMOS Client in JavaScript and DNS-SD API which aren't part of the specifications.
 
 ## How to install and run the container
-
 ### On a Mellanox Switch running Onyx NOS
 Prerequisites:
  - Run Onyx version 3.8.2000+ as a minimum
  - Set accurate date and time on the switch - Use PTP, NTP or set manually using the "clock set" command
- - Create and have "interface vlans" for all VLANs that you want the container to be exposed on Execute the following switch commands to download and run the container on the switch:
+ - Create and have "interface vlans" for all VLANs that you want the container to be exposed on
+ 
+ Execute the following switch commands to download and run the container on the switch:
  - Login as administrator to the switch CLI
  - "docker" - Enables the Docker subsystem on the switch (Make sure you exit the docker menu tree using "exit")
  - "docker no shutdown" - Activates Docker on the switch
@@ -44,17 +46,18 @@ Prerequisites:
  - Recommended to run using Ubuntu 18.04+
  - Have an accurate date and time
  - Install a full Docker CE environment using these instructions: https://docs.docker.com/v17.09/engine/installation/linux/docker-ce/ubuntu/ 
+
 Execute the follow linux commands to download and run the container on the host:
  - sudo docker pull rhastie/nmos-cpp:latest
- - sudo docker run -it --net=host --privileged --rm 
-rhastie/nmos-cpp:latest
+ - sudo docker run -it --net=host --privileged --rm rhastie/nmos-cpp:latest
 
 ### Access Web interface
-The implementation published on port 8010
+The container publsihed on all available IP addresses using port 8010
 
  - Browser to http://[Switch or Host IP Address>]:8010 to get to the interface.
  - The NMOS REgistry is published on the "x-nmos" URL
  - The NMOS Browser Client is published on the "admin" URL
+
 # How to build the container
 - Make sure you have a fully function Docker CE environment. It is recommended you follow these instructions for Ubuntu: https://docs.docker.com/v17.09/engine/installation/linux/docker-ce/ubuntu/ 
 - Clone the repository to your host
