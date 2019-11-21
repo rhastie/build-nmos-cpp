@@ -4,11 +4,15 @@ This repository contains all the Docker files needed for an
 implementation of the AMWA Networked Media Open Specifications. The 
 resulting Docker Container is specifically optimised to operate on a 
 Mellanox switch, but can also function independently on a standard host. 
-Please see overview presentation from the IP Showcase at IBC 2019: Video 
-- https://youtu.be/MXbepL2lmK4 and Slides - 
-http://www.ipshowcase.org/wp-content/uploads/2019/10/1500-Simplifying-JT-NM-TR-1001-1-Deployments-through-Microservices.pdf 
+Please see overview presentation from the IP Showcase @ IBC 2019:
+
+- Video here: https://youtu.be/MXbepL2lmK4
+- Slides here: http://www.ipshowcase.org/wp-content/uploads/2019/10/1500-Simplifying-JT-NM-TR-1001-1-Deployments-through-Microservices.pdf 
+
+
 Specifically the implementation supports the following specifications:
- - AMWA IS-04 NMOS Discovery and Registration Specification (supporting 
+
+- AMWA IS-04 NMOS Discovery and Registration Specification (supporting 
 v1.0-v1.3)
  - AMWA IS-05 NMOS Connection Management Specification (supporting 
 v1.0-v1.1)
@@ -17,8 +21,10 @@ v1.0-v1.1)
 TR-1001-1:2018 Annex A) (supporting v1.0-Dev)
  - AMWA BCP-002-01 NMOS Grouping Recommendations - Natural Grouping
  - AMWA BCP-003-01 NMOS API Security Recommendations - Securing 
-Communications Additionally it supports the following additional 
-components:
+Communications
+
+Additionally it supports the following additional components:
+
  - Supports auto identification of the Boundary Clock PTP Domain and 
 published via AMWA IS-09 System Resource when run on a Mellanox switch
  - Supports an embedded NMOS Browser Client
@@ -29,6 +35,7 @@ NMOS Node, Registration and Query APIs, and the NMOS Connection API. It
 also included a NMOS Client in JavaScript and DNS-SD API which aren't 
 part of the specifications.
 ## How to install and run the container
+
 ### On a Mellanox Switch running Onyx NOS
 Prerequisites:
  - Run Onyx version 3.8.2000+ as a minimum
@@ -46,6 +53,7 @@ the Docker container from Docker Hub
  - "docker start rhastie/nmos-cpp latest nmos now privileged network" - 
 Start Docker container immediately
  - "docker no start nmos" - Stops the Docker container
+
 ### On a standard Linux host
 Prerequisites:
  - Recommended to run using Ubuntu 18.04+
@@ -57,15 +65,18 @@ the host:
  - sudo docker pull rhastie/nmos-cpp:latest
  - sudo docker run -it --net=host --privileged --rm 
 rhastie/nmos-cpp:latest
+
 ### Access Web interface
+The implementation published on port 8010
+
  - Browser to http://[Switch or Host IP Address>]:8010 to get to the 
 interface.
  - The NMOS REgistry is published on the "x-nmos" URL
  - The NMOS Browser Client is published on the "admin" URL
 # How to build the container
-Make sure you have a fully function Docker CE environment. It is 
+- Make sure you have a fully function Docker CE environment. It is 
 recommended you follow these instructions for Ubuntu: 
 https://docs.docker.com/v17.09/engine/installation/linux/docker-ce/ubuntu/ 
-Clone the repository to your host
-Run "sudo make build"
+- Clone the repository to your host
+- Run "sudo make build"
 
