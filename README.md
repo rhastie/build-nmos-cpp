@@ -30,14 +30,14 @@ The nmos-cpp container includes implementations of the NMOS Node, Registration a
 ### On a Mellanox Switch running Onyx NOS
 Prerequisites:
 - Run Onyx version 3.8.2000+ as a minimum
-- Set accurate date and time on the switch - Use PTP, NTP or set manually using the "clock set" command
+- Set an accurate date and time on the switch - Use PTP, NTP or set manually using the "clock set" command
 - Create and have "interface vlans" for all VLANs that you want the container to be exposed on
  
  Execute the following switch commands to download and run the container on the switch:
 - Login as administrator to the switch CLI
 - "docker" - Enables the Docker subsystem on the switch (Make sure you exit the docker menu tree using "exit")
 - "docker no shutdown" - Activates Docker on the switch
-- "docker pull rhastie/nmos-cpp:latest" - Pull the latest version of the Docker container from Docker Hub
+- "docker pull rhastie/nmos-cpp:latest" - Pulls the latest version of the Docker container from Docker Hub
 - "docker start rhastie/nmos-cpp latest nmos now privileged network" - Start Docker container immediately
 - "docker no start nmos" - Stops the Docker container
 
@@ -54,7 +54,7 @@ Execute the follow Linux commands to download and run the container on the host:
 ### Accessing the Web GUI Interface
 The container publsihes on all available IP addresses using port 8010
 
-- Browser to http://[Switch or Host IP Address>]:8010 to get to the Web GUIinterface.
+- Browse to http://[Switch or Host IP Address>]:8010 to get to the Web GUI interface.
 - The NMOS Registry is published on the "x-nmos" URL
 - The NMOS Browser Client is published on the "admin" URL
 
