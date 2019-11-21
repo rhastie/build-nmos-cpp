@@ -51,7 +51,7 @@ Execute the follow Linux commands to download and run the container on the host:
 - sudo docker pull rhastie/nmos-cpp:latest
 - sudo docker run -it --net=host --privileged --rm rhastie/nmos-cpp:latest
 
-### Access Web interface
+### Accessing the Web GUI Interface
 The container publsihes on all available IP addresses using port 8010
 
 - Browser to http://[Switch or Host IP Address>]:8010 to get to the Web GUIinterface.
