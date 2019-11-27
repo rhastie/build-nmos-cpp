@@ -1,5 +1,5 @@
 NAME = nmos-cpp
-VERSION = dev
+VERSION = 0.1P-bf6bc18
 
 .PHONY: all build run save test tag_latest clean-docker-stopped-containers clean-docker-untagged-images
 
