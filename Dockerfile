@@ -1,10 +1,11 @@
-FROM ubuntu:disco as stage1-build
+FROM ubuntu:bionic as stage1-build
 
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    g++ build-essential openssl libssl-dev unzip git wget dbus avahi-daemon libavahi-compat-libdnssd-dev \
-    zlib1g-dev gnupg curl ca-certificates nano libnss-mdns && \
+    g++ build-essential openssl libssl-dev unzip git wget \
+    zlib1g-dev gnupg curl ca-certificates nano && \
+# Avahi:    dbus avahi-daemon libavahi-compat-libdnssd-dev libnss-mdns AND NOT make \
     curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
     echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
     apt-get update && apt-get install -y --no-install-recommends yarn nodejs && \
@@ -21,9 +22,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 #    ldconfig && openssl version && \
 #    cd /home/ && rm openssl-1.1.1b.tar.gz && rm -rf /home/openssl-1.1.1b
 
-## Get and Make CMake version 3.15.5 (latest when Dockerfile developed) - Adjust as necessary
-RUN cd /home/ && wget --no-check-certificate https://cmake.org/files/v3.15/cmake-3.15.5.tar.gz && \  
-    tar xvf cmake-3.15.5.tar.gz && rm cmake-3.15.5.tar.gz && cd /home/cmake-3.15.5 && \
+## Get and Make CMake version 3.16.1 (latest when Dockerfile developed) - Adjust as necessary
+RUN cd /home/ && wget --no-check-certificate https://cmake.org/files/v3.16/cmake-3.16.1.tar.gz && \  
+    tar xvf cmake-3.16.1.tar.gz && rm cmake-3.16.1.tar.gz && cd /home/cmake-3.16.1 && \
     ./bootstrap && make && make install
 
 ## Get and Make Boost 1.69.0 (latest when Dockerfile developed) - Adjust as necessary
@@ -44,11 +45,13 @@ RUN cd /home/ && git init && git config --global http.sslVerify false && \
 
 ## You should use either Avahi or Apple mDNS - DO NOT use both
 ## 
-## mDNSResponder 878.30.4
-#RUN cd /home/ && wget --no-check-certificate https://opensource.apple.com/tarballs/mDNSResponder/mDNSResponder-878.30.4.tar.gz && \
-#    tar xvf mDNSResponder-878.30.4.tar.gz && rm mDNSResponder-878.30.4.tar.gz && \
-#    patch -d mDNSResponder-878.30.4/ -p1 <nmos-cpp/Development/third_party/mDNSResponder/poll-rather-than-select.patch && \
-#    cd /home/mDNSResponder-878.30.4/mDNSPosix && set HAVE_IPV6=0 && make os=linux && make os=linux install
+## mDNSResponder 878.200.35 Build and install
+RUN cd /home/ && wget --no-check-certificate https://opensource.apple.com/tarballs/mDNSResponder/mDNSResponder-878.200.35.tar.gz && \
+    tar xvf mDNSResponder-878.200.35.tar.gz && rm mDNSResponder-878.200.35.tar.gz && \
+    patch -d mDNSResponder-878.200.35/ -p1 <nmos-cpp/Development/third_party/mDNSResponder/unicast.patch && \
+    patch -d mDNSResponder-878.200.35/ -p1 <nmos-cpp/Development/third_party/mDNSResponder/permit-over-long-service-types.patch && \
+    patch -d mDNSResponder-878.200.35/ -p1 <nmos-cpp/Development/third_party/mDNSResponder/poll-rather-than-select.patch && \
+    cd /home/mDNSResponder-878.200.35/mDNSPosix && make os=linux && make os=linux install
 
 ## Get and Make Microsft C++ REST SDK v2.10.14 from Microsoft Archive
 RUN cd /home/ && git init && git config --global http.sslVerify false && \
@@ -118,30 +121,38 @@ RUN cd /home/ && git init && git config --global http.sslVerify false && \
 RUN cd /home/nmos-cpp/Development/build && \
     cp nmos-cpp-node nmos-cpp-registry nmos-cpp-test /home && \
     cp /home/boost_1_69_0/stage/lib/* /usr/local/lib && \
-#    cd /home/cmake-3.15.5 && make uninstall && \
-    cd /home && rm -rf .git cmake-3.15.5 mDNSResponder-878.30.4 boost_1_69_0 cpprestsdk-2.10.14 nmos-cpp nmos-js nmos-web-router
+#    cd /home/cmake-3.16.1 && make uninstall && \
+    cd /home && rm -rf .git cmake-3.16.1 boost_1_69_0 cpprestsdk-2.10.14 nmos-cpp nmos-js nmos-web-router
 #    apt-get remove g++ build-essential unzip git wget yarn ca-certificates nodejs gnupg curl -y --no-install-recommends && \
 #    apt-get autoclean -y && \
 #    apt-get autoremove -y && \
 #    rm -rf /var/lib/apt/lists/* && \
 #    rm -rf /usr/share/doc/ && rm -rf /usr/share/man/ && rm -rf /usr/share/locale/ && \
-#    rm -rf /usr/local/share/man/* && rm -rf /usr/local/share/.cache/* && rm -rf /usr/local/share/cmake-3.15/*
+#    rm -rf /usr/local/share/man/* && rm -rf /usr/local/share/.cache/* && rm -rf /usr/local/share/cmake-3.16/*
 
 ## Re-build container for optimised runtime environment using clean Ubuntu Disco release
 
-FROM ubuntu:disco
+FROM ubuntu:bionic
+
+#Copy required files from build container
+COPY --from=stage1-build /home /home
+COPY --from=stage1-build /usr/local/lib /usr/local/lib
 
 #Update container with latest patches and needed packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    openssl libssl-dev dbus avahi-daemon libavahi-compat-libdnssd-dev \
-    zlib1g-dev nano libnss-mdns curl jq && \
-    rm -rf /var/lib/apt/lists/* && \
+    openssl libssl-dev make \
+# Avahi:    dbus avahi-daemon libavahi-compat-libdnssd-dev libnss-mdns AND NOT make \
+    zlib1g-dev nano curl jq && \
+    cd /home/mDNSResponder-878.200.35/mDNSPosix && make os=linux install && \
+    cd /home && rm -rf /home/mDNSResponder-878.200.35 /etc/nsswitch.conf.pre-mdns && \
+    apt-get remove -y make && \
     apt-get clean -y --no-install-recommends && \
-    apt-get autoclean -y --no-install-recommends
+    apt-get autoclean -y --no-install-recommends && \
+    rm -rf /var/lib/apt/lists/* && \
+    rm -rf /usr/share/doc/ && rm -rf /usr/share/man/ && rm -rf /usr/share/locale/ && \
+    rm -rf /usr/local/share/man/* && rm -rf /usr/local/share/.cache/*
 
-#Copy required files and entrypoint.sh script to image
-COPY --from=stage1-build /home /home
-COPY --from=stage1-build /usr/local/lib /usr/local/lib
+#Copy entrypoint.sh script to image
 COPY entrypoint.sh container-config registry-json /home/
 
 #Set script to executable
