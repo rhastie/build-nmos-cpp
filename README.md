@@ -20,9 +20,9 @@ Specifically the implementation supports the following specifications:
 
 Additionally it supports the following additional components:
 
- - Supports auto identification of the switch Boundary Clock PTP Domain which is published via the AMWA IS-09 System Resource when run on a Mellanox switch
-- Supports an embedded NMOS Browser Client
-- Supports a DNS-SD Bridge to HTML implementation 
+- Supports auto identification of the switch Boundary Clock PTP Domain which is published via the AMWA IS-09 System Resource when run on a Mellanox switch
+- Supports an embedded NMOS Browser Client which support NMOS Control using AMWA IS-05
+- Supports a DNS-SD Bridge to HTML implementation that supports both mDNS and DNS-SD
 
 The nmos-cpp container includes implementations of the NMOS Node, Registration and Query APIs, and the NMOS Connection API. It also included a NMOS Client in JavaScript and a DNS-SD API which aren't part of the specifications.
 
@@ -33,13 +33,19 @@ Prerequisites:
 - Set an accurate date and time on the switch - Use PTP, NTP or set manually using the "clock set" command
 - Create and have "interface vlans" for all VLANs that you want the container to be exposed on
  
- Execute the following switch commands to download and run the container on the switch:
+Execute the following switch commands to download and run the container on the switch:
 - Login as administrator to the switch CLI
 - "docker" - Enables the Docker subsystem on the switch (Make sure you exit the docker menu tree using "exit")
 - "docker no shutdown" - Activates Docker on the switch
 - "docker pull rhastie/nmos-cpp:latest" - Pulls the latest version of the Docker container from Docker Hub
 - "docker start rhastie/nmos-cpp latest nmos now privileged network" - Start Docker container immediately
 - "docker no start nmos" - Stops the Docker container
+
+Additional/optional steps:
+On a Mellanox switch the DNS configuration used by the container is inherited from the switch configuration
+- If you want to configure a DNS server for use by the container you can use the "ip name-server" switch command to specify a DNS server. By default, the container will use any DNS servers provided by DHCP
+- If you want to configure a DNS search domain for the container you can use the "ip domain-list" switch command to specify DNS search domains. By default, the container will use any DNS search domains provided by DHCP. In the absence of any being configured it will default to ".local" ie. mDNS
+- If you want to understand the current DNS configuration use the switch command "show hosts"
 
 ### On a standard Linux host
 Prerequisites:

@@ -109,11 +109,12 @@ fi
 # You should use either Avahi or Apple mDNS - DO NOT use both
 #
 # mDNSResponder 878.30.4
-#   /etc/init.d/mdns start
+echo -e "\nStarting mDNSResponder service"
+/etc/init.d/mdns start
 # Avahi
-echo -e "\nStarting dbus and avahi services"
-/etc/init.d/dbus start
-/etc/init.d/avahi-daemon start
+#echo -e "\nStarting dbus and avahi services"
+#/etc/init.d/dbus start
+#/etc/init.d/avahi-daemon start
 
 # Start Sony Registry Application inside correct directory with logging on or off
 sleep 1

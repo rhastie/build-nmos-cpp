@@ -22,10 +22,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 #    ldconfig && openssl version && \
 #    cd /home/ && rm openssl-1.1.1b.tar.gz && rm -rf /home/openssl-1.1.1b
 
-## Get and Make CMake version 3.16.1 (latest when Dockerfile developed) - Adjust as necessary
-RUN cd /home/ && wget --no-check-certificate https://cmake.org/files/v3.16/cmake-3.16.1.tar.gz && \  
-    tar xvf cmake-3.16.1.tar.gz && rm cmake-3.16.1.tar.gz && cd /home/cmake-3.16.1 && \
-    ./bootstrap && make && make install
+## Get and Make CMake version 3.16.4 (latest when Dockerfile developed) - Adjust as necessary
+RUN cd /home/ && wget --no-check-certificate https://cmake.org/files/v3.16/cmake-3.16.4.tar.gz && \  
+    tar xvf cmake-3.16.4.tar.gz && rm cmake-3.16.4.tar.gz && cd /home/cmake-3.16.4 && \
+    ./bootstrap && make -j8 && make install
 
 ## Get and Make Boost 1.69.0 (latest when Dockerfile developed) - Adjust as necessary
 RUN cd /home/ && wget --no-check-certificate https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz && \
@@ -45,13 +45,13 @@ RUN cd /home/ && git init && git config --global http.sslVerify false && \
 
 ## You should use either Avahi or Apple mDNS - DO NOT use both
 ## 
-## mDNSResponder 878.200.35 Build and install
-RUN cd /home/ && wget --no-check-certificate https://opensource.apple.com/tarballs/mDNSResponder/mDNSResponder-878.200.35.tar.gz && \
-    tar xvf mDNSResponder-878.200.35.tar.gz && rm mDNSResponder-878.200.35.tar.gz && \
-    patch -d mDNSResponder-878.200.35/ -p1 <nmos-cpp/Development/third_party/mDNSResponder/unicast.patch && \
-    patch -d mDNSResponder-878.200.35/ -p1 <nmos-cpp/Development/third_party/mDNSResponder/permit-over-long-service-types.patch && \
-    patch -d mDNSResponder-878.200.35/ -p1 <nmos-cpp/Development/third_party/mDNSResponder/poll-rather-than-select.patch && \
-    cd /home/mDNSResponder-878.200.35/mDNSPosix && make os=linux && make os=linux install
+## mDNSResponder 878.260.1 Build and install
+RUN cd /home/ && wget --no-check-certificate https://opensource.apple.com/tarballs/mDNSResponder/mDNSResponder-878.260.1.tar.gz && \
+    tar xvf mDNSResponder-878.260.1.tar.gz && rm mDNSResponder-878.260.1.tar.gz && \
+    patch -d mDNSResponder-878.260.1/ -p1 <nmos-cpp/Development/third_party/mDNSResponder/unicast.patch && \
+    patch -d mDNSResponder-878.260.1/ -p1 <nmos-cpp/Development/third_party/mDNSResponder/permit-over-long-service-types.patch && \
+    patch -d mDNSResponder-878.260.1/ -p1 <nmos-cpp/Development/third_party/mDNSResponder/poll-rather-than-select.patch && \
+    cd /home/mDNSResponder-878.260.1/mDNSPosix && make os=linux && make os=linux install
 
 ## Get and Make Microsft C++ REST SDK v2.10.14 from Microsoft Archive
 RUN cd /home/ && git init && git config --global http.sslVerify false && \
@@ -67,7 +67,7 @@ RUN cd /home/ && git init && git config --global http.sslVerify false && \
     -DOPENSSL_LIBRARIES="/usr/lib/x86_64-linux-gnu" \ 
     -DBOOST_INCLUDEDIR:PATH="/home/boost_1_69_0" \
     -DBOOST_LIBRARYDIR:PATH="/home/boost_1_69_0/x64/lib" && \
-    make && \
+    make -j8 && \
     make install
 
 ## Build nmos-cpp from source
@@ -75,14 +75,16 @@ RUN mkdir /home/nmos-cpp/Development/build && \
     cd /home/nmos-cpp/Development/build && \
     cmake \
     -G "Unix Makefiles" \
-    -DCMAKE_CONFIGURATION_TYPES:STRING="Debug;Release" \
+    -DCMAKE_BUILD_TYPE:STRING="Release" \
+    -DCMAKE_CONFIGURATION_TYPES:STRING="Release" \
+    -DCXXFLAGS:STRING="-Os" \
     -DBoost_USE_STATIC_LIBS:BOOL="1" \
     -DBOOST_INCLUDEDIR:PATH="/home/boost_1_69_0" \
     -DBOOST_LIBRARYDIR:PATH="/home/boost_1_69_0/x64/lib" \
     -DWEBSOCKETPP_INCLUDE_DIR:PATH="/home/cpprestsdk-2.10.14/Release/libs/websocketpp" \
     -DCPPREST_INCLUDE_DIR:PATH="/home/cpprestsdk-2.10.14/" \
     -build /home/nmos-cpp/Development/build .. && \
-    make
+    make -j8
 
 ## Generate Example Certificates and position into correct locations
 RUN cd /home/certs && mkdir run-certs && ./generateCerts registration1 nmos.tv query1.nmos.tv && \
@@ -98,7 +100,7 @@ RUN cd /home/certs && mkdir run-certs && ./generateCerts registration1 nmos.tv q
 
 ## Create relevant configuration files for Sony Registry and Node
 
-RUN cd /home/ && mkdir example-conf && mkdir admin && mkdir admin/router
+RUN cd /home/ && mkdir example-conf && mkdir admin
 ADD example-conf /home/example-conf
 
 ## Get and build source for Sony nmos-js
@@ -119,10 +121,11 @@ RUN cd /home/ && git init && git config --global http.sslVerify false && \
 
 ## Move executables, libraries and clean up container as much as possible
 RUN cd /home/nmos-cpp/Development/build && \
-    cp nmos-cpp-node nmos-cpp-registry nmos-cpp-test /home && \
+    cp nmos-cpp-node nmos-cpp-registry /home && \
+#    cp nmos-cpp-node nmos-cpp-registry nmos-cpp-test /home && \
     cp /home/boost_1_69_0/stage/lib/* /usr/local/lib && \
-#    cd /home/cmake-3.16.1 && make uninstall && \
-    cd /home && rm -rf .git cmake-3.16.1 boost_1_69_0 cpprestsdk-2.10.14 nmos-cpp nmos-js nmos-web-router
+#    cd /home/cmake-3.16.4 && make uninstall && \
+    cd /home && rm -rf .git cmake-3.16.4 boost_1_69_0 cpprestsdk-2.10.14 nmos-cpp nmos-js nmos-web-router
 #    apt-get remove g++ build-essential unzip git wget yarn ca-certificates nodejs gnupg curl -y --no-install-recommends && \
 #    apt-get autoclean -y && \
 #    apt-get autoremove -y && \
@@ -143,8 +146,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     openssl libssl-dev make \
 # Avahi:    dbus avahi-daemon libavahi-compat-libdnssd-dev libnss-mdns AND NOT make \
     zlib1g-dev nano curl jq && \
-    cd /home/mDNSResponder-878.200.35/mDNSPosix && make os=linux install && \
-    cd /home && rm -rf /home/mDNSResponder-878.200.35 /etc/nsswitch.conf.pre-mdns && \
+    cd /home/mDNSResponder-878.260.1/mDNSPosix && make os=linux install && \
+    cd /home && rm -rf /home/mDNSResponder-878.260.1 /etc/nsswitch.conf.pre-mdns && \
     apt-get remove -y make && \
     apt-get clean -y --no-install-recommends && \
     apt-get autoclean -y --no-install-recommends && \
