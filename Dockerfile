@@ -31,7 +31,7 @@ RUN cd /home/ && wget --no-check-certificate https://cmake.org/files/v3.16/cmake
 RUN cd /home/ && wget --no-check-certificate https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz && \
     tar xvf boost_1_69_0.tar.gz && rm boost_1_69_0.tar.gz && cd /home/boost_1_69_0 && \
     ./bootstrap.sh b2 --with-toolset=gcc --with-libraries=date_time,regex,system,thread,random,filesystem,chrono,atomic \
-    --prefix=. && ./b2
+    --prefix=. && ./b2 variant=release
 
 ## Get Certificates and scripts from AMWA-TV/nmos-testing                         
 RUN cd /home && mkdir certs && git config --global http.sslVerify false && \
@@ -60,6 +60,7 @@ RUN cd /home/ && git init && git config --global http.sslVerify false && \
     cd /home/cpprestsdk*/Release/build && \
     cmake .. \
     -DCMAKE_BUILD_TYPE:STRING="Release" \
+    -DCXXFLAGS:STRING="-Os" \
     -DWERROR:BOOL="0" \
     -DBUILD_SAMPLES:BOOL="0" \
     -DBUILD_TESTS:BOOL="0" \
@@ -67,7 +68,7 @@ RUN cd /home/ && git init && git config --global http.sslVerify false && \
     -DOPENSSL_LIBRARIES="/usr/lib/x86_64-linux-gnu" \ 
     -DBOOST_INCLUDEDIR:PATH="/home/boost_1_69_0" \
     -DBOOST_LIBRARYDIR:PATH="/home/boost_1_69_0/x64/lib" && \
-    make -j8 && \
+    make && \
     make install
 
 ## Build nmos-cpp from source
@@ -84,7 +85,7 @@ RUN mkdir /home/nmos-cpp/Development/build && \
     -DWEBSOCKETPP_INCLUDE_DIR:PATH="/home/cpprestsdk-2.10.14/Release/libs/websocketpp" \
     -DCPPREST_INCLUDE_DIR:PATH="/home/cpprestsdk-2.10.14/" \
     -build /home/nmos-cpp/Development/build .. && \
-    make -j8
+    make
 
 ## Generate Example Certificates and position into correct locations
 RUN cd /home/certs && mkdir run-certs && ./generateCerts registration1 nmos.tv query1.nmos.tv && \
@@ -105,7 +106,13 @@ ADD example-conf /home/example-conf
 
 ## Get and build source for Sony nmos-js
 RUN cd /home/ && git init && git config --global http.sslVerify false && \
-    git clone https://github.com/sony/nmos-js.git && \
+    git clone https://github.com/sony/nmos-js.git
+COPY mellanox-logo-horizontal-blue.png nmos-js.patch /home/nmos-js/Development/src/assets/
+RUN cd /home && \
+    mv /home/nmos-js/Development/src/assets/nmos-js.patch /home && \
+    patch -p0 <nmos-js.patch && \
+    rm /home/nmos-js/Development/src/assets/sea-lion.png && \
+    rm nmos-js.patch && \
     cd /home/nmos-js/Development && \
     yarn install && \
     yarn build && \
@@ -148,7 +155,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     zlib1g-dev nano curl jq && \
     cd /home/mDNSResponder-878.260.1/mDNSPosix && make os=linux install && \
     cd /home && rm -rf /home/mDNSResponder-878.260.1 /etc/nsswitch.conf.pre-mdns && \
-    apt-get remove -y make && \
+    apt-get purge -y make && \
     apt-get clean -y --no-install-recommends && \
     apt-get autoclean -y --no-install-recommends && \
     rm -rf /var/lib/apt/lists/* && \
