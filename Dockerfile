@@ -53,10 +53,10 @@ RUN cd /home/ && wget --no-check-certificate https://opensource.apple.com/tarbal
     patch -d mDNSResponder-878.260.1/ -p1 <nmos-cpp/Development/third_party/mDNSResponder/poll-rather-than-select.patch && \
     cd /home/mDNSResponder-878.260.1/mDNSPosix && make os=linux && make os=linux install
 
-## Get and Make Microsft C++ REST SDK v2.10.14 from Microsoft Archive
+## Get and Make Microsft C++ REST SDK v2.10.15 from Microsoft Archive
 RUN cd /home/ && git init && git config --global http.sslVerify false && \
-    git clone --recursive --branch v2.10.14 https://github.com/Microsoft/cpprestsdk cpprestsdk-2.10.14 && \
-    mkdir /home/cpprestsdk-2.10.14/Release/build && \
+    git clone --recursive --branch v2.10.15 https://github.com/Microsoft/cpprestsdk cpprestsdk-2.10.15 && \
+    mkdir /home/cpprestsdk-2.10.15/Release/build && \
     cd /home/cpprestsdk*/Release/build && \
     cmake .. \
     -DCMAKE_BUILD_TYPE:STRING="Release" \
@@ -82,8 +82,8 @@ RUN mkdir /home/nmos-cpp/Development/build && \
     -DBoost_USE_STATIC_LIBS:BOOL="1" \
     -DBOOST_INCLUDEDIR:PATH="/home/boost_1_69_0" \
     -DBOOST_LIBRARYDIR:PATH="/home/boost_1_69_0/x64/lib" \
-    -DWEBSOCKETPP_INCLUDE_DIR:PATH="/home/cpprestsdk-2.10.14/Release/libs/websocketpp" \
-    -DCPPREST_INCLUDE_DIR:PATH="/home/cpprestsdk-2.10.14/" \
+    -DWEBSOCKETPP_INCLUDE_DIR:PATH="/home/cpprestsdk-2.10.15/Release/libs/websocketpp" \
+    -DCPPREST_INCLUDE_DIR:PATH="/home/cpprestsdk-2.10.15/" \
     -build /home/nmos-cpp/Development/build .. && \
     make
 
@@ -132,7 +132,7 @@ RUN cd /home/nmos-cpp/Development/build && \
 #    cp nmos-cpp-node nmos-cpp-registry nmos-cpp-test /home && \
     cp /home/boost_1_69_0/stage/lib/* /usr/local/lib && \
 #    cd /home/cmake-3.16.4 && make uninstall && \
-    cd /home && rm -rf .git cmake-3.16.4 boost_1_69_0 cpprestsdk-2.10.14 nmos-cpp nmos-js nmos-web-router
+    cd /home && rm -rf .git cmake-3.16.4 boost_1_69_0 cpprestsdk-2.10.15 nmos-cpp nmos-js nmos-web-router
 #    apt-get remove g++ build-essential unzip git wget yarn ca-certificates nodejs gnupg curl -y --no-install-recommends && \
 #    apt-get autoclean -y && \
 #    apt-get autoremove -y && \
