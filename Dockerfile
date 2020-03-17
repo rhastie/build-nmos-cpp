@@ -71,7 +71,7 @@ RUN cd /home/ && git init && git config --global http.sslVerify false && \
     -DOPENSSL_LIBRARIES="/usr/lib/x86_64-linux-gnu" \
     -DBOOST_INCLUDEDIR:PATH="/home/boost_1_69_0" \
     -DBOOST_LIBRARYDIR:PATH="/home/boost_1_69_0/x64/lib" && \
-    make -j8 && \
+    make && \
     make install
 
 ## Build nmos-cpp from source
@@ -88,7 +88,7 @@ RUN mkdir /home/nmos-cpp/Development/build && \
     -DWEBSOCKETPP_INCLUDE_DIR:PATH="/home/cpprestsdk-2.10.15/Release/libs/websocketpp" \
     -DCPPREST_INCLUDE_DIR:PATH="/home/cpprestsdk-2.10.15/" \
     -build /home/nmos-cpp/Development/build .. && \
-    make -j8
+    make
 
 ## Generate Example Certificates and position into correct locations
 RUN cd /home/certs && mkdir run-certs && ./generateCerts registration1 nmos.tv query1.nmos.tv && \
