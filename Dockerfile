@@ -1,6 +1,7 @@
 FROM ubuntu:bionic as stage1-build
 
-ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
+ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn \
+    NMOS_CPP_VERSION=cf5411084ef50f2773be7d095efa477eabe21a84
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     g++ build-essential openssl libssl-dev unzip git wget \
@@ -40,8 +41,8 @@ RUN cd /home && mkdir certs && git config --global http.sslVerify false && \
     rm -rf /home/nmos-testing
 
 ## Get source for Sony nmos-cpp/
-RUN cd /home/ && git init && git config --global http.sslVerify false && \
-    git clone https://github.com/sony/nmos-cpp.git
+RUN cd /home/ && curl --output - -s https://codeload.github.com/sony/nmos-cpp/tar.gz/$NMOS_CPP_VERSION | tar zxvf - -C . && \
+    mv ./nmos-cpp-${NMOS_CPP_VERSION} ./nmos-cpp
 
 ## You should use either Avahi or Apple mDNS - DO NOT use both
 ##
