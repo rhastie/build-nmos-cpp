@@ -1,7 +1,9 @@
 FROM ubuntu:bionic as stage1-build
+MAINTAINER richh@mellanox.com
+LABEL maintainer="richh@mellanox.com"
 
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn \
-    NMOS_CPP_VERSION=cf5411084ef50f2773be7d095efa477eabe21a84
+    NMOS_CPP_VERSION=d1dd55b192aa9e3487715fbcda72d2ae6398ce71
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     g++ build-essential openssl libssl-dev unzip git wget \
@@ -26,7 +28,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 ## Get and Make CMake version 3.16.5 (latest when Dockerfile developed) - Adjust as necessary
 RUN cd /home/ && wget --no-check-certificate https://cmake.org/files/v3.16/cmake-3.16.5.tar.gz && \
     tar xvf cmake-3.16.5.tar.gz && rm cmake-3.16.5.tar.gz && cd /home/cmake-3.16.5 && \
-    ./bootstrap && make && make install
+    ./bootstrap && make -j8 && make install
 
 ## Get and Make Boost 1.69.0 (latest when Dockerfile developed) - Adjust as necessary
 RUN cd /home/ && wget --no-check-certificate https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz && \
@@ -69,7 +71,7 @@ RUN cd /home/ && git init && git config --global http.sslVerify false && \
     -DOPENSSL_LIBRARIES="/usr/lib/x86_64-linux-gnu" \
     -DBOOST_INCLUDEDIR:PATH="/home/boost_1_69_0" \
     -DBOOST_LIBRARYDIR:PATH="/home/boost_1_69_0/x64/lib" && \
-    make && \
+    make -j8 && \
     make install
 
 ## Build nmos-cpp from source
@@ -86,7 +88,7 @@ RUN mkdir /home/nmos-cpp/Development/build && \
     -DWEBSOCKETPP_INCLUDE_DIR:PATH="/home/cpprestsdk-2.10.15/Release/libs/websocketpp" \
     -DCPPREST_INCLUDE_DIR:PATH="/home/cpprestsdk-2.10.15/" \
     -build /home/nmos-cpp/Development/build .. && \
-    make
+    make -j8
 
 ## Generate Example Certificates and position into correct locations
 RUN cd /home/certs && mkdir run-certs && ./generateCerts registration1 nmos.tv query1.nmos.tv && \
