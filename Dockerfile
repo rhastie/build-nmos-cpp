@@ -115,7 +115,7 @@ RUN cd /home && \
     rm /home/nmos-js/Development/src/assets/sea-lion.png && \
     rm nmos-js.patch && \
     cd /home/nmos-js/Development && \
-    yarn install && \
+    yarn install --network-timeout 1000000 && \
     yarn build && \
     cp -rf /home/nmos-js/Development/build/* /home/admin
 
