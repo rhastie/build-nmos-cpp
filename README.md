@@ -41,7 +41,7 @@ The container has been tested on the following platforms for compatibility:
 - Mellanox SN2000, SN3000 and SN4000 Series switches
 - Mellanox Bluefield family of SmartNICs (operating natively on the SmartNIC ARM cores)
 - NVIDIA Jetson AGX Xavier Developer Kit (even though not tested the container should function on all NVIDIA AGX platforms)
-- Raspberry Pi RPi 3 Model B and RPi 4 Model B (both Raspbian's standard 32-bit and the new experimental 64-bit kernel have been tested)
+- Raspberry Pi RPi 3 Model B and RPi 4 Model B (both Raspbian's standard 32-bit and the new experimental 64-bit kernels have been tested)
 - Standard Intel and AMD Servers running the container under Ubuntu Linux - Both bare-metal and virtualised environments have been tested. 
 
 ## How to install and run the container
@@ -108,7 +108,7 @@ Prerequisites:
 
 - It's generally recommended to run latest version of Raspbian (Buster at the time of testing)
 - Have an accurate date and time
-- If using Raspbian Buster you can installed Docker using "sudo apt-get install docker.io". If using older versions of Raspbian install a full Docker CE environment using [instructions](https://docs.docker.com/install/linux/docker-ce/ubuntu/)>
+- If using Raspbian Buster you can installed Docker using "sudo apt-get install docker.io". If using older versions of Raspbian install a full Docker CE environment using [instructions](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
 - Set [docker permission](https://superuser.com/questions/835696/how-solve-permission-problems-for-docker-in-ubuntu#853682) for your host user
 
 Execute the follow Linux commands to download and run the container on the host:
