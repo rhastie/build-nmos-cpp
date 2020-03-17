@@ -2,6 +2,7 @@
 "pri": 10,
 "logging_level": -10,
 "allow_invalid_resources": false,
+"http_trace": false,
 "label": "mellanox_container",
 "http_port": 8010,
 "query_ws_port": 8011,
