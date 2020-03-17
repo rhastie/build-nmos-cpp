@@ -44,7 +44,7 @@ echo -e "\nStart of container entrypoint.sh BASH script..."
 
 # If we were given arguments, override the default configuration and run /bin/bash
 if [ $# -gt 0 ]; then
-   exec /bin/bash fi
+   exec /bin/bash
    exit $?  # Make sure we really exit
 fi
 
@@ -128,7 +128,8 @@ else
     echo -e "\nStarting with Logging disabled"
     /home/nmos-cpp-registry $registry_json > /dev/null
 fi
+ret=$?
 
 echo -e "\nEnd of script..."
 
-exit $?  # Make sure we really exit
+exit $ret  # Make sure we really exit

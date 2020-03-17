@@ -23,7 +23,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 #    cd /home/ && rm openssl-1.1.1b.tar.gz && rm -rf /home/openssl-1.1.1b
 
 ## Get and Make CMake version 3.16.4 (latest when Dockerfile developed) - Adjust as necessary
-RUN cd /home/ && wget --no-check-certificate https://cmake.org/files/v3.16/cmake-3.16.4.tar.gz && \  
+RUN cd /home/ && wget --no-check-certificate https://cmake.org/files/v3.16/cmake-3.16.4.tar.gz && \
     tar xvf cmake-3.16.4.tar.gz && rm cmake-3.16.4.tar.gz && cd /home/cmake-3.16.4 && \
     ./bootstrap && make -j8 && make install
 
@@ -33,7 +33,7 @@ RUN cd /home/ && wget --no-check-certificate https://dl.bintray.com/boostorg/rel
     ./bootstrap.sh b2 --with-toolset=gcc --with-libraries=date_time,regex,system,thread,random,filesystem,chrono,atomic \
     --prefix=. && ./b2 variant=release
 
-## Get Certificates and scripts from AMWA-TV/nmos-testing                         
+## Get Certificates and scripts from AMWA-TV/nmos-testing
 RUN cd /home && mkdir certs && git config --global http.sslVerify false && \
     git clone https://github.com/AMWA-TV/nmos-testing.git && \
     mv /home/nmos-testing/test_data/BCP00301/ca/* /home/certs && \
@@ -44,7 +44,7 @@ RUN cd /home/ && git init && git config --global http.sslVerify false && \
     git clone https://github.com/sony/nmos-cpp.git
 
 ## You should use either Avahi or Apple mDNS - DO NOT use both
-## 
+##
 ## mDNSResponder 878.260.1 Build and install
 RUN cd /home/ && wget --no-check-certificate https://opensource.apple.com/tarballs/mDNSResponder/mDNSResponder-878.260.1.tar.gz && \
     tar xvf mDNSResponder-878.260.1.tar.gz && rm mDNSResponder-878.260.1.tar.gz && \
@@ -65,7 +65,7 @@ RUN cd /home/ && git init && git config --global http.sslVerify false && \
     -DBUILD_SAMPLES:BOOL="0" \
     -DBUILD_TESTS:BOOL="0" \
     -DOPENSSL_ROOT_DIR="/usr/lib/x86_64-linux-gnu" \
-    -DOPENSSL_LIBRARIES="/usr/lib/x86_64-linux-gnu" \ 
+    -DOPENSSL_LIBRARIES="/usr/lib/x86_64-linux-gnu" \
     -DBOOST_INCLUDEDIR:PATH="/home/boost_1_69_0" \
     -DBOOST_LIBRARYDIR:PATH="/home/boost_1_69_0/x64/lib" && \
     make && \
@@ -140,7 +140,7 @@ RUN cd /home/nmos-cpp/Development/build && \
 #    rm -rf /usr/share/doc/ && rm -rf /usr/share/man/ && rm -rf /usr/share/locale/ && \
 #    rm -rf /usr/local/share/man/* && rm -rf /usr/local/share/.cache/* && rm -rf /usr/local/share/cmake-3.16/*
 
-## Re-build container for optimised runtime environment using clean Ubuntu Disco release
+## Re-build container for optimised runtime environment using clean Ubuntu Bionic release
 
 FROM ubuntu:bionic
 
@@ -162,7 +162,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     rm -rf /usr/share/doc/ && rm -rf /usr/share/man/ && rm -rf /usr/share/locale/ && \
     rm -rf /usr/local/share/man/* && rm -rf /usr/local/share/.cache/*
 
-#Copy entrypoint.sh script to image
+#Copy entrypoint.sh script and master config to image
 COPY entrypoint.sh container-config registry-json /home/
 
 #Set script to executable

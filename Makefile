@@ -14,9 +14,6 @@ run: build
 save: build
 	docker save $(NAME):$(VERSION)| gzip > $(NAME)_$(VERSION).img.tar.gz
 
-test: build
-	docker run -it --rm --net=host $(NAME):$(VERSION)
-
 tag_latest:
 	docker tag $(NAME):$(VERSION) $(NAME):latest
 
