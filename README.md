@@ -74,9 +74,10 @@ On a Mellanox switch the DNS configuration used by the container is inherited fr
 
 Prerequisites:
 
-- It's generally recommended to run using Ubuntu 18.04+
+- It's generally recommended to use the Ubuntu 18.04+ based BFB (Bluefield bootstream) image as this contains all necessary drivers and OS as a single bundle. See [download page](https://www.mellanox.com/products/software/bluefield)
 - Have an accurate date and time
-- Install a full Docker CE environment using [instructions](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
+- Make sure external connectivity and name resolution are available from the SmartNIC Ubuntu OS - There are several ways that this can be done. Please review the Bluefield documentation
+- Docker is generally provided under the Mellanox BFB image, but if not available, install a full Docker CE environment using [instructions](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
 - Set [docker permission](https://superuser.com/questions/835696/how-solve-permission-problems-for-docker-in-ubuntu#853682) for your host user
 
 Execute the follow Linux commands to download and run the container on the host:
