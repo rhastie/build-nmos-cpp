@@ -12,6 +12,9 @@ version:
 build: version
 	docker build -t $(NAME):$(VERSION) .
 
+buildx: version
+	docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t $(NAME):$(VERSION) .
+
 run: build
 	docker run -it --net=host --rm $(NAME):$(VERSION)
 
