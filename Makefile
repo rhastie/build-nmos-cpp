@@ -1,6 +1,8 @@
 NAME = nmos-cpp
 # grab the abrev commit SHA from Dockerfile
 VERSION = 0.1S-$(shell sed -n 's/.*NMOS_CPP_VERSION=\(.......\).*/\1/p' Dockerfile)
+# Get number of processors available and add 1
+NPROC = $(shell echo $(shell nproc)+1 | bc)
 
 .PHONY: all version build run save test tag_latest clean-docker-stopped-containers clean-docker-untagged-images
 
@@ -10,10 +12,10 @@ version:
 	@echo Docker image version: $(VERSION)
 
 build: version
-	docker build -t $(NAME):$(VERSION) .
+	docker build -t $(NAME):$(VERSION) --build-arg makemt=$(NPROC) .
 
 buildx: version
-	docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t $(NAME):$(VERSION) .
+	docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t $(NAME):$(VERSION) --build-arg makemt=$(NPROC) .
 
 run: build
 	docker run -it --net=host --rm $(NAME):$(VERSION)
