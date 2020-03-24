@@ -175,6 +175,6 @@ COPY entrypoint.sh container-config registry-json /home/
 #Set script to executable
 RUN chmod +x /home/entrypoint.sh
 
-#WORKDIR /home/
-#ENTRYPOINT ["/home/entrypoint.sh"]
+WORKDIR /home/
+ENTRYPOINT ["/home/entrypoint.sh"]
 #CMD []
