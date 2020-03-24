@@ -5,7 +5,7 @@ LABEL maintainer="richh@mellanox.com"
 ARG makemt
 
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn \
-    NMOS_CPP_VERSION=d1dd55b192aa9e3487715fbcda72d2ae6398ce71
+    NMOS_CPP_VERSION=1c0ddf43a36a635e8d703a455652f24279b1ba52
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     g++ build-essential openssl libssl-dev unzip git wget \
@@ -27,9 +27,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 #    ldconfig && openssl version && \
 #    cd /home/ && rm openssl-1.1.1b.tar.gz && rm -rf /home/openssl-1.1.1b
 
-## Get and Make CMake version 3.16.5 (latest when Dockerfile developed) - Adjust as necessary
-RUN cd /home/ && wget --no-check-certificate https://cmake.org/files/v3.16/cmake-3.16.5.tar.gz && \
-    tar xvf cmake-3.16.5.tar.gz && rm cmake-3.16.5.tar.gz && cd /home/cmake-3.16.5 && \
+## Get and Make CMake version 3.17.0 (latest when Dockerfile developed) - Adjust as necessary
+RUN cd /home/ && wget --no-check-certificate https://cmake.org/files/v3.17/cmake-3.17.0.tar.gz && \
+    tar xvf cmake-3.17.0.tar.gz && rm cmake-3.17.0.tar.gz && cd /home/cmake-3.17.0 && \
     ./bootstrap && \
     if [ -n "$makemt" ]; then echo "Making multi-threaded with $makemt jobs"; make -j$makemt; else echo "Making single-threaded"; make; fi && \
     make install
@@ -138,8 +138,8 @@ RUN cd /home/nmos-cpp/Development/build && \
     cp nmos-cpp-node nmos-cpp-registry /home && \
 #    cp nmos-cpp-node nmos-cpp-registry nmos-cpp-test /home && \
     cp /home/boost_1_69_0/stage/lib/* /usr/local/lib && \
-#    cd /home/cmake-3.16.5 && make uninstall && \
-    cd /home && rm -rf .git cmake-3.16.5 boost_1_69_0 cpprestsdk-2.10.15 nmos-cpp nmos-js nmos-web-router
+#    cd /home/cmake-3.17.0 && make uninstall && \
+    cd /home && rm -rf .git cmake-3.17.0 boost_1_69_0 cpprestsdk-2.10.15 nmos-cpp nmos-js nmos-web-router
 #    apt-get remove g++ build-essential unzip git wget yarn ca-certificates nodejs gnupg curl -y --no-install-recommends && \
 #    apt-get autoclean -y && \
 #    apt-get autoremove -y && \
