@@ -52,7 +52,7 @@ RUN cd /home/ && wget --no-check-certificate https://opensource.apple.com/tarbal
     cd /home/mDNSResponder-878.260.1/mDNSPosix && make os=linux && make os=linux install
 
 ## Get and Make Microsft C++ REST SDK v2.10.15 from Microsoft Archive
-RUN cd /home/ && git init && git config --global http.sslVerify false && \
+RUN cd /home/ && git config --global http.sslVerify false && \
     git clone --recursive --branch v2.10.15 https://github.com/Microsoft/cpprestsdk cpprestsdk-2.10.15 && \
     mkdir /home/cpprestsdk-2.10.15/Release/build && \
     cd /home/cpprestsdk*/Release/build && \
@@ -98,12 +98,11 @@ RUN cd /home/certs && mkdir run-certs && ./generateCerts registration1 nmos.tv q
     cp dhparam.pem /home/certs/run-certs/dhparam.pem
 
 ## Create relevant configuration files for Sony Registry and Node
-
 RUN cd /home/ && mkdir example-conf && mkdir admin
 ADD example-conf /home/example-conf
 
 ## Get and build source for Sony nmos-js
-RUN cd /home/ && git init && git config --global http.sslVerify false && \
+RUN cd /home/ && git config --global http.sslVerify false && \
     git clone https://github.com/sony/nmos-js.git
 COPY mellanox-logo-horizontal-blue.png nmos-js.patch /home/nmos-js/Development/src/assets/
 RUN cd /home && \
@@ -119,20 +118,8 @@ RUN cd /home && \
 ## Move executables, libraries and clean up container as much as possible
 RUN cd /home/nmos-cpp/Development/build && \
     cp nmos-cpp-node nmos-cpp-registry /home && \
-#    cp nmos-cpp-node nmos-cpp-registry nmos-cpp-test /home && \
     cp /home/boost_1_69_0/stage/lib/* /usr/local/lib && \
-<<<<<<< HEAD
-#    cd /home/cmake-3.17.0 && make uninstall && \
     cd /home && rm -rf .git cmake-3.17.0 boost_1_69_0 cpprestsdk-2.10.15 nmos-cpp nmos-js nmos-web-router
-#    apt-get remove g++ build-essential unzip git wget yarn ca-certificates nodejs gnupg curl -y --no-install-recommends && \
-#    apt-get autoclean -y && \
-#    apt-get autoremove -y && \
-#    rm -rf /var/lib/apt/lists/* && \
-#    rm -rf /usr/share/doc/ && rm -rf /usr/share/man/ && rm -rf /usr/share/locale/ && \
-#    rm -rf /usr/local/share/man/* && rm -rf /usr/local/share/.cache/* && rm -rf /usr/local/share/cmake-3.16/*
-=======
-    cd /home && rm -rf .git cmake-3.16.5 boost_1_69_0 cpprestsdk-2.10.15 nmos-cpp nmos-js nmos-web-router
->>>>>>> 450594e... build: remove dead code
 
 ## Re-build container for optimised runtime environment using clean Ubuntu Bionic release
 
