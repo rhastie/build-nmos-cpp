@@ -42,9 +42,9 @@ do_params() { # get global parameters from config file and set alternative defau
 
 echo -e "\nStart of container entrypoint.sh BASH script..."
 
-# If we were given arguments, override the default configuration and run /bin/bash
+# If we were given arguments, override the default command and interpret in /bin/bash
 if [ $# -gt 0 ]; then
-   exec /bin/bash
+   exec $@
    exit $?  # Make sure we really exit
 fi
 
