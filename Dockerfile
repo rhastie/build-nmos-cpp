@@ -18,15 +18,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     apt-get clean -y --no-install-recommends && \
     apt-get autoclean -y --no-install-recommends
 
-## Get and Make OpenSSL 1.1.1b in order to support TLS1.3
-#RUN cd /home/ && wget --no-check-certificate https://www.openssl.org/source/openssl-1.1.1b.tar.gz && \
-#    tar -zxf openssl-1.1.1b.tar.gz && cd openssl-1.1.1b && \
-#    ./config shared zlib && \
-#    make && make test && make install && \
-#    ln -s /usr/local/bin/openssl /usr/bin/openssl && \
-#    ldconfig && openssl version && \
-#    cd /home/ && rm openssl-1.1.1b.tar.gz && rm -rf /home/openssl-1.1.1b
-
 ## Get and Make CMake version 3.17.0 (latest when Dockerfile developed) - Adjust as necessary
 RUN cd /home/ && wget --no-check-certificate https://cmake.org/files/v3.17/cmake-3.17.0.tar.gz && \
     tar xvf cmake-3.17.0.tar.gz && rm cmake-3.17.0.tar.gz && cd /home/cmake-3.17.0 && \
@@ -125,19 +116,12 @@ RUN cd /home && \
     yarn build && \
     cp -rf /home/nmos-js/Development/build/* /home/admin
 
-## Get and build source for BBC nmos-web-router
-#RUN cd /home/ && git init && git config --global http.sslVerify false && \
-#    git clone https://github.com/bbc/nmos-web-router && \
-#    cd /home/nmos-web-router/ && \
-#    yarn install && \
-#    yarn build && \
-#    cp -rf /home/nmos-web-router/build/* /home/admin/router
-
 ## Move executables, libraries and clean up container as much as possible
 RUN cd /home/nmos-cpp/Development/build && \
     cp nmos-cpp-node nmos-cpp-registry /home && \
 #    cp nmos-cpp-node nmos-cpp-registry nmos-cpp-test /home && \
     cp /home/boost_1_69_0/stage/lib/* /usr/local/lib && \
+<<<<<<< HEAD
 #    cd /home/cmake-3.17.0 && make uninstall && \
     cd /home && rm -rf .git cmake-3.17.0 boost_1_69_0 cpprestsdk-2.10.15 nmos-cpp nmos-js nmos-web-router
 #    apt-get remove g++ build-essential unzip git wget yarn ca-certificates nodejs gnupg curl -y --no-install-recommends && \
@@ -146,6 +130,9 @@ RUN cd /home/nmos-cpp/Development/build && \
 #    rm -rf /var/lib/apt/lists/* && \
 #    rm -rf /usr/share/doc/ && rm -rf /usr/share/man/ && rm -rf /usr/share/locale/ && \
 #    rm -rf /usr/local/share/man/* && rm -rf /usr/local/share/.cache/* && rm -rf /usr/local/share/cmake-3.16/*
+=======
+    cd /home && rm -rf .git cmake-3.16.5 boost_1_69_0 cpprestsdk-2.10.15 nmos-cpp nmos-js nmos-web-router
+>>>>>>> 450594e... build: remove dead code
 
 ## Re-build container for optimised runtime environment using clean Ubuntu Bionic release
 
