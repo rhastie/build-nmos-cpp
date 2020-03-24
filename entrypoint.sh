@@ -122,11 +122,11 @@ sleep 1
 echo -e "\nStarting Sony Registry Application with following congfig"
 cat $registry_json
 if cfg_haskey log_registry && [ "$(cfg_read log_registry)" = "TRUE" ]; then
-    echo -e "\nStarting with Logging enabled"
+    echo -e "\nStarting with file logging"
     /home/nmos-cpp-registry $registry_json >>/home/logreg-err.txt 2>/home/logreg-out.txt
 else
-    echo -e "\nStarting with Logging disabled"
-    /home/nmos-cpp-registry $registry_json > /dev/null
+    echo -e "\nStarting with output to console"
+    /home/nmos-cpp-registry $registry_json
 fi
 ret=$?
 
