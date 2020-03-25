@@ -5,7 +5,7 @@ LABEL maintainer="richh@mellanox.com"
 ARG makemt
 
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn \
-    NMOS_CPP_VERSION=1c0ddf43a36a635e8d703a455652f24279b1ba52
+    NMOS_CPP_VERSION=5704afc904fb5fe9271dc6fff6d2d0e043c2a2a5
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     g++ build-essential openssl libssl-dev unzip git wget \
