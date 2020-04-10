@@ -15,7 +15,7 @@ build: version
 	docker build -t $(NAME):$(VERSION) --build-arg makemt=$(NPROC) .
 
 buildx: version
-	docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t $(NAME):$(VERSION) --build-arg makemt=$(NPROC) .
+	docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t rhastie/$(NAME):$(VERSION) --build-arg makemt=$(NPROC) --push .
 
 run: build
 	docker run -d -it --net=host --name $(NAME)-registry --rm $(NAME):$(VERSION)

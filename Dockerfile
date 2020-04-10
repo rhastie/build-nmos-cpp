@@ -5,7 +5,7 @@ LABEL maintainer="richh@mellanox.com"
 ARG makemt
 
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn \
-    NMOS_CPP_VERSION=5704afc904fb5fe9271dc6fff6d2d0e043c2a2a5
+    NMOS_CPP_VERSION=0faf53fe6b39e6533f838bb84b3ed88f67cb4bbe
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     g++ build-essential openssl libssl-dev unzip git wget \
@@ -26,7 +26,7 @@ RUN cd /home/ && wget --no-check-certificate https://cmake.org/files/v3.17/cmake
     make install
 
 ## Get and Make Boost 1.69.0 (latest when Dockerfile developed) - Adjust as necessary
-RUN cd /home/ && wget --no-check-certificate https://dl.bintray.com/boostorg/release/1.69.0/source/boost_1_69_0.tar.gz && \
+RUN cd /home/ && wget --no-check-certificate https://ayera.dl.sourceforge.net/project/boost/boost/1.69.0/boost_1_69_0.tar.gz && \
     tar xvf boost_1_69_0.tar.gz && rm boost_1_69_0.tar.gz && cd /home/boost_1_69_0 && \
     ./bootstrap.sh b2 --with-toolset=gcc --with-libraries=date_time,regex,system,thread,random,filesystem,chrono,atomic \
     --prefix=. && ./b2 variant=release
@@ -74,6 +74,7 @@ RUN mkdir /home/nmos-cpp/Development/build && \
     cd /home/nmos-cpp/Development/build && \
     cmake \
     -G "Unix Makefiles" \
+    -DUSE_CONAN:BOOL="0" \
     -DCMAKE_BUILD_TYPE:STRING="Release" \
     -DCMAKE_CONFIGURATION_TYPES:STRING="Release" \
     -DCXXFLAGS:STRING="-Os" \
