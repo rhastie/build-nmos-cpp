@@ -20,6 +20,9 @@ buildx: version
 run: build
 	docker run -d -it --net=host --name $(NAME)-registry --rm $(NAME):$(VERSION)
 
+start: run
+	docker attach $(NAME)-registry
+
 log:
 	docker logs -f $(NAME)-registry
 
