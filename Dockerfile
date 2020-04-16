@@ -5,23 +5,23 @@ LABEL maintainer="richh@mellanox.com"
 ARG makemt
 
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn \
-    NMOS_CPP_VERSION=0faf53fe6b39e6533f838bb84b3ed88f67cb4bbe
+    NMOS_CPP_VERSION=b30c1a98670aa05f5b35c7b5340c5ec5893df508
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    g++ build-essential openssl libssl-dev unzip git wget \
-    gnupg curl ca-certificates nano \
+RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -y --no-install-recommends \
+    g++ build-essential \
+    openssl libssl-dev git wget gnupg curl ca-certificates nano \
     python3 python3-pip python3-setuptools && \
 # Avahi:    dbus avahi-daemon libavahi-compat-libdnssd-dev libnss-mdns AND NOT make \
-    curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
+    curl -sS -k https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
     echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
     apt-get update && apt-get install -y --no-install-recommends yarn nodejs && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean -y --no-install-recommends && \
     apt-get autoclean -y --no-install-recommends
 
-## Get and Make CMake version 3.17.1 (latest when Dockerfile developed) - Adjust as necessary
-RUN cd /home/ && wget --no-check-certificate https://cmake.org/files/v3.17/cmake-3.17.1.tar.gz && \
-    tar xvf cmake-3.17.1.tar.gz && rm cmake-3.17.1.tar.gz && cd /home/cmake-3.17.1 && \
+## Get and Make CMake version 3.17.2 (latest when Dockerfile developed) - Adjust as necessary
+RUN cd /home/ && wget --no-check-certificate https://cmake.org/files/v3.17/cmake-3.17.2.tar.gz && \
+    tar xvf cmake-3.17.2.tar.gz && rm cmake-3.17.2.tar.gz && cd /home/cmake-3.17.2 && \
     ./bootstrap && \
     if [ -n "$makemt" ]; then echo "Making multi-threaded with $makemt jobs"; make -j$makemt; else echo "Making single-threaded"; make; fi && \
     make install
@@ -39,7 +39,7 @@ RUN cd /home && mkdir certs && git config --global http.sslVerify false && \
     rm -rf /home/nmos-testing
 
 ## Get source for Sony nmos-cpp/
-RUN cd /home/ && curl --output - -s https://codeload.github.com/sony/nmos-cpp/tar.gz/$NMOS_CPP_VERSION | tar zxvf - -C . && \
+RUN cd /home/ && curl --output - -s -k https://codeload.github.com/sony/nmos-cpp/tar.gz/$NMOS_CPP_VERSION | tar zxvf - -C . && \
     mv ./nmos-cpp-${NMOS_CPP_VERSION} ./nmos-cpp
 
 ## You should use either Avahi or Apple mDNS - DO NOT use both
@@ -51,6 +51,12 @@ RUN cd /home/ && wget --no-check-certificate https://opensource.apple.com/tarbal
     patch -d mDNSResponder-878.260.1/ -p1 <nmos-cpp/Development/third_party/mDNSResponder/permit-over-long-service-types.patch && \
     patch -d mDNSResponder-878.260.1/ -p1 <nmos-cpp/Development/third_party/mDNSResponder/poll-rather-than-select.patch && \
     cd /home/mDNSResponder-878.260.1/mDNSPosix && make os=linux && make os=linux install
+
+## Patch conanfile.txt so that OpenSSL version is aligned to the current distribution version
+#RUN openssl version && cd /home/nmos-cpp/Development && \
+#    openssl version | cut -d ' ' -f1,2 | sed -e 's/.*/\L&/;s/ /\\\//g' > distsslversion && \
+#    sed -i "s/openssl.*/$(cat distsslversion)/g" conanfile.txt && \
+#    rm distsslversion
 
 ## Build Sony nmos-cpp from sources
 RUN mkdir /home/nmos-cpp/Development/build && \
@@ -96,7 +102,7 @@ RUN cd /home && \
 ## Move executables, libraries and clean up container as much as possible
 RUN cd /home/nmos-cpp/Development/build && \
     cp nmos-cpp-node nmos-cpp-registry /home && \
-    cd /home && rm -rf .git conan cmake-3.17.1 nmos-cpp nmos-js nmos-web-router
+    cd /home && rm -rf .git conan cmake-3.17.2 nmos-cpp nmos-js nmos-web-router
 
 ## Re-build container for optimised runtime environment using clean Ubuntu Bionic release
 
@@ -106,7 +112,7 @@ FROM ubuntu:bionic
 COPY --from=stage1-build /home /home
 
 ##Update container with latest patches and needed packages
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -y --no-install-recommends \
     openssl make \
 # Avahi:    dbus avahi-daemon libavahi-compat-libdnssd-dev libnss-mdns AND NOT make \
     nano curl jq && \
@@ -122,7 +128,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 ##Copy entrypoint.sh script and master config to image
 COPY entrypoint.sh container-config registry-json /home/
 
-#S#et script to executable
+##Set script to executable
 RUN chmod +x /home/entrypoint.sh
 
 WORKDIR /home/
