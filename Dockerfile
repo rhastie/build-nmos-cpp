@@ -5,7 +5,7 @@ LABEL maintainer="richh@mellanox.com"
 ARG makemt
 
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn \
-    NMOS_CPP_VERSION=b30c1a98670aa05f5b35c7b5340c5ec5893df508
+    NMOS_CPP_VERSION=9207228436665888d209701fe4956a59fc9750cc
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -y --no-install-recommends \
     g++ build-essential \
@@ -105,11 +105,14 @@ RUN cd /home/nmos-cpp/Development/build && \
     cd /home && rm -rf .git conan cmake-3.17.2 nmos-cpp nmos-js nmos-web-router
 
 ## Re-build container for optimised runtime environment using clean Ubuntu Bionic release
-
 FROM ubuntu:bionic
 
 ##Copy required files from build container
 COPY --from=stage1-build /home /home
+
+##Set default config variable to run registry (FALSE) or node (TRUE)
+ARG runnode=FALSE
+ENV RUN_NODE=$runnode
 
 ##Update container with latest patches and needed packages
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -y --no-install-recommends \
@@ -126,7 +129,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -
     rm -rf /usr/local/share/man/* && rm -rf /usr/local/share/.cache/*
 
 ##Copy entrypoint.sh script and master config to image
-COPY entrypoint.sh container-config registry-json /home/
+COPY entrypoint.sh container-config registry-json node-json /home/
 
 ##Set script to executable
 RUN chmod +x /home/entrypoint.sh

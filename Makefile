@@ -14,15 +14,23 @@ version:
 build: version
 	docker build -t $(NAME):$(VERSION) --build-arg makemt=$(NPROC) .
 
+buildnode: version
+	docker build -t $(NAME)-node:$(VERSION) --build-arg makemt=$(NPROC) --build-arg runnode=TRUE .
+
 buildx: version
 	docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t rhastie/$(NAME):$(VERSION) --build-arg makemt=$(NPROC) --push .
-#	docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t rhastie/$(NAME):$(VERSION) --build-arg makemt=$(NPROC) .
 
 run: build
 	docker run -d -it --net=host --name $(NAME)-registry --rm $(NAME):$(VERSION)
 
+runnode: buildnode
+	docker run -d -it --net=host --name $(NAME)-node --rm $(NAME)-node:$(VERSION)
+
 start: run
 	docker attach $(NAME)-registry
+
+startnode: runnode
+	docker attach $(NAME)-node
 
 log:
 	docker logs -f $(NAME)-registry

@@ -2,7 +2,7 @@
 registry_json=/home/registry-json
 
 #Output registry stdout/stderr output to a log inside container
-log_registry=FALSE
+log_output=FALSE
 
 #Update/insert label parameter with container hostname on entrypoint script run
 update_label=TRUE

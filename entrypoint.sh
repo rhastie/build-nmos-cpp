@@ -34,6 +34,13 @@ do_params() { # get global parameters from config file and set alternative defau
         echo -e "Default to Registry JSON file /home/registry-json"
   fi
 
+  if cfg_haskey node_json; then
+        registry_json=$(cfg_read node_json)
+        echo -e "Using Node JSON file $registry_json"
+  else
+        node_json="/home/node-json"
+        echo -e "Default to Registry JSON file /home/node-json"
+  fi
 }
 
 ###
@@ -58,9 +65,18 @@ do_params
 
 echo -e "\nChecking for update_label parameter"
 if cfg_haskey update_label && [ "$(cfg_read update_label)" = "TRUE" ]; then
+
+    # Update label field in registry-json
+
     echo -e "Insert/Replace label: with $(hostname) hostname in $registry_json file"
     jq --arg key "$(hostname)" '. + {label: $key}' "$registry_json" > /home/registry-json.tmp
     mv /home/registry-json.tmp $registry_json
+
+    # Update label field in node-json
+
+    echo -e "Insert/Replace label: with $(hostname) hostname in $node_json file"
+    jq --arg key "$(hostname)-node" '. + {label: $key}' "$node_json" > /home/node-json.tmp
+    mv /home/node-json.tmp $node_json
 fi
 
 # Adjust registry-json to update/add "ptp_domain_number" with relevant PTP Domain data if on a Mellanox switch
@@ -116,20 +132,39 @@ echo -e "\nStarting mDNSResponder service"
 #/etc/init.d/dbus start
 #/etc/init.d/avahi-daemon start
 
-# Start Sony Registry Application inside correct directory with logging on or off
+# Start Sony Registry or Node Application inside correct directory with logging on or off
 sleep 1
 
-echo -e "\nStarting Sony Registry Application with following congfig"
-cat $registry_json
-if cfg_haskey log_registry && [ "$(cfg_read log_registry)" = "TRUE" ]; then
-    echo -e "\nStarting with file logging"
-    /home/nmos-cpp-registry $registry_json >>/home/logreg-err.txt 2>/home/logreg-out.txt
-else
-    echo -e "\nStarting with output to console"
-    /home/nmos-cpp-registry $registry_json
-fi
-ret=$?
+if [ -v RUN_NODE ] && [ "$RUN_NODE" = "TRUE" ]; then
 
+    # Start Sony Node Application 
+
+    echo -e "\nStarting Sony Node Application with following config"
+    cat $node_json
+    if cfg_haskey log_output && [ "$(cfg_read log_output)" = "TRUE" ]; then
+        echo -e "\nStarting with file logging"
+        /home/nmos-cpp-node $node_json >>/home/logreg-err.txt 2>/home/logreg-out.txt
+    else
+        echo -e "\nStarting with output to console"
+        /home/nmos-cpp-node $node_json
+    fi
+    ret=$?
+
+else
+
+    # Start Sony Registry Application
+
+    echo -e "\nStarting Sony Registry Application with following config"
+    cat $registry_json
+    if cfg_haskey log_output && [ "$(cfg_read log_output)" = "TRUE" ]; then
+        echo -e "\nStarting with file logging"
+        /home/nmos-cpp-registry $registry_json >>/home/logreg-err.txt 2>/home/logreg-out.txt
+    else
+        echo -e "\nStarting with output to console"
+        /home/nmos-cpp-registry $registry_json
+    fi
+    ret=$?
+fi
 echo -e "\nEnd of script..."
 
 exit $ret  # Make sure we really exit
