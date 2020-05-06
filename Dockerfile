@@ -28,9 +28,9 @@ RUN cd /home/ && wget --no-check-certificate https://cmake.org/files/v3.17/cmake
 
 ## Get Conan and it's dependencies
 RUN cd /home/ && git config --global http.sslVerify false && \
-git clone --branch release/1.24 https://github.com/conan-io/conan.git && \
-cd conan && pip3 install wheel && pip3 install -e . && export PYTHONPATH=$PYTHONPATH:$(pwd) && \
-export PYTHONPATH=$PYTHONPATH:$(pwd)
+    git clone --branch release/1.24 https://github.com/conan-io/conan.git && \
+    cd conan && pip3 install wheel && pip3 install -e . && export PYTHONPATH=$PYTHONPATH:$(pwd) && \
+    export PYTHONPATH=$PYTHONPATH:$(pwd)
 
 ## Get Certificates and scripts from AMWA-TV/nmos-testing
 RUN cd /home && mkdir certs && git config --global http.sslVerify false && \
@@ -51,12 +51,6 @@ RUN cd /home/ && wget --no-check-certificate https://opensource.apple.com/tarbal
     patch -d mDNSResponder-878.260.1/ -p1 <nmos-cpp/Development/third_party/mDNSResponder/permit-over-long-service-types.patch && \
     patch -d mDNSResponder-878.260.1/ -p1 <nmos-cpp/Development/third_party/mDNSResponder/poll-rather-than-select.patch && \
     cd /home/mDNSResponder-878.260.1/mDNSPosix && make os=linux && make os=linux install
-
-## Patch conanfile.txt so that OpenSSL version is aligned to the current distribution version
-#RUN openssl version && cd /home/nmos-cpp/Development && \
-#    openssl version | cut -d ' ' -f1,2 | sed -e 's/.*/\L&/;s/ /\\\//g' > distsslversion && \
-#    sed -i "s/openssl.*/$(cat distsslversion)/g" conanfile.txt && \
-#    rm distsslversion
 
 ## Build Sony nmos-cpp from sources
 RUN mkdir /home/nmos-cpp/Development/build && \
@@ -88,13 +82,17 @@ ADD example-conf /home/example-conf
 ## Get and build source for Sony nmos-js
 RUN cd /home/ && git config --global http.sslVerify false && \
     git clone https://github.com/sony/nmos-js.git
+
+## Custom branding
 COPY mellanox-logo-horizontal-blue.png nmos-js.patch /home/nmos-js/Development/src/assets/
 RUN cd /home && \
     mv /home/nmos-js/Development/src/assets/nmos-js.patch /home && \
     patch -p0 <nmos-js.patch && \
     rm /home/nmos-js/Development/src/assets/sea-lion.png && \
-    rm nmos-js.patch && \
-    cd /home/nmos-js/Development && \
+    rm nmos-js.patch
+
+## Build and install Sony nmos-js
+RUN cd /home/nmos-js/Development && \
     yarn install --network-timeout 1000000 && \
     yarn build && \
     cp -rf /home/nmos-js/Development/build/* /home/admin
