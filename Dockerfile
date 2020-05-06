@@ -110,10 +110,6 @@ FROM ubuntu:bionic
 ##Copy required files from build container
 COPY --from=stage1-build /home /home
 
-##Set default config variable to run registry (FALSE) or node (TRUE)
-ARG runnode=FALSE
-ENV RUN_NODE=$runnode
-
 ##Update container with latest patches and needed packages
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -y --no-install-recommends \
     openssl make \
