@@ -44,7 +44,7 @@ The container has been tested on the following platforms for compatibility:
 - Raspberry Pi RPi 3 Model B and RPi 4 Model B (both Raspbian's standard 32-bit and the new experimental 64-bit kernels have been tested)
 - Standard Intel and AMD Servers running the container under Ubuntu Linux - Both bare-metal and virtualised environments have been tested. 
 
-## How to install and run the container
+## How to install and run the container NMOS Registry/Controller
 
 ### On a Mellanox Switch running Onyx NOS
 
@@ -135,20 +135,55 @@ docker pull rhastie/nmos-cpp:latest
 docker run -it --net=host --privileged --rm rhastie/nmos-cpp:latest
 ```
 
-## Accessing the Web GUI Interface
+## Accessing the NMOS Web GUI Interface
 
 The container publishes on all available IP addresses using port 8010
 
 - Browse to http://[Switch or Host IP Address>]:8010 to get to the Web GUI interface.
 - The NMOS Registry is published on the "x-nmos" URL
-- The NMOS Browser Client is published on the "admin" URL
+- The NMOS Browser Client/Controller is published on the "admin" URL
+
+
+## Running the NMOS Virtual Node implementation
+
+The container also contains an implementation of NMOS Virtual Node. This can simulate a node attaching to the registry/controller. Importantly, a single instance of the container can run the registry/controller or the node, but not both at the same time. If you need both operating, you just start a second instance of the container.
+
+By design the container is configured not to run the node implementation by default, however, you can override this default using two different approaches:
+
+### Using an environment variable
+
+There is a docker environmental variable available that will override the default execution of the container and start the NMOS Virtual node. Use the following command to start the container using this variable:
+
+```sh
+docker run -it --net=host --name nmos-registry --rm -e "RUN_NODE=TRUE" rhastie/nmos-cpp:latest
+```
+
+### Building the container and altering the default execution
+
+You can use the process below to build the container so that the default execution is changed and the container executes the NMOS Virtual Node at runtime without needing an environmental variable being set
+
 
 ## How to build the container
 
-- Make sure you have a fully function Docker CE environment. It is recommended you follow [the instructions for Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
+Below are some brief instructions on how to build the container. There are several additional commands available and its suggested you review the Makefile in the repository
+
+### Building the default container for NMOS Registry/Controller execution
+
+- Make sure you have a fully functioning Docker CE environment. It is recommended you follow [the instructions for Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
 - Clone this repository to your host
 - Run:
 
 ```sh
 make build
 ```
+
+### Building the container for NMOS Virtual Node execution
+
+- Make sure you have a fully functioning Docker CE environment. It is recommended you follow [the instructions for Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
+- Clone this repository to your host
+- Run:
+
+```sh
+make buildnode
+```
+Please note the container will be built with a “-node” suffix applied to remove any confusion.
