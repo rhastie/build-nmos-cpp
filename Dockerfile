@@ -122,15 +122,15 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -
     rm -rf /usr/share/doc/ && rm -rf /usr/share/man/ && rm -rf /usr/share/locale/ && \
     rm -rf /usr/local/share/man/* && rm -rf /usr/local/share/.cache/*
 
-##Set default config variable to run registry (FALSE) or node (TRUE)
-ARG runnode=FALSE
-ENV RUN_NODE=$runnode
-
 ##Copy entrypoint.sh script and master config to image
 COPY entrypoint.sh container-config registry-json node-json /home/
 
 ##Set script to executable
 RUN chmod +x /home/entrypoint.sh
+
+##Set default config variable to run registry (FALSE) or node (TRUE)
+ARG runnode=FALSE
+ENV RUN_NODE=$runnode
 
 WORKDIR /home/
 ENTRYPOINT ["/home/entrypoint.sh"]

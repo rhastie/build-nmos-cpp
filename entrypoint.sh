@@ -35,8 +35,8 @@ do_params() { # get global parameters from config file and set alternative defau
   fi
 
   if cfg_haskey node_json; then
-        registry_json=$(cfg_read node_json)
-        echo -e "Using Node JSON file $registry_json"
+        node_json=$(cfg_read node_json)
+        echo -e "Using Node JSON file $node_json"
   else
         node_json="/home/node-json"
         echo -e "Default to Registry JSON file /home/node-json"
@@ -69,7 +69,7 @@ if cfg_haskey update_label && [ "$(cfg_read update_label)" = "TRUE" ]; then
     # Update label field in registry-json
 
     echo -e "Insert/Replace label: with $(hostname) hostname in $registry_json file"
-    jq --arg key "$(hostname)" '. + {label: $key}' "$registry_json" > /home/registry-json.tmp
+    jq --arg key "$(hostname)-registry" '. + {label: $key}' "$registry_json" > /home/registry-json.tmp
     mv /home/registry-json.tmp $registry_json
 
     # Update label field in node-json
