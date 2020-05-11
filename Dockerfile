@@ -123,7 +123,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -
     rm -rf /usr/local/share/man/* && rm -rf /usr/local/share/.cache/*
 
 ##Copy entrypoint.sh script and master config to image
-COPY entrypoint.sh container-config registry-json node-json /home/
+COPY entrypoint.sh container-config registry.json node.json /home/
 
 ##Set script to executable
 RUN chmod +x /home/entrypoint.sh

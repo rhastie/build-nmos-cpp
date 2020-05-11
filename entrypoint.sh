@@ -30,16 +30,16 @@ do_params() { # get global parameters from config file and set alternative defau
         registry_json=$(cfg_read registry_json)
         echo -e "Using Registry JSON file $registry_json"
   else
-        registry_json="/home/registry-json"
-        echo -e "Default to Registry JSON file /home/registry-json"
+        registry_json="/home/registry.json"
+        echo -e "Default to Registry JSON file /home/registry.json"
   fi
 
   if cfg_haskey node_json; then
         node_json=$(cfg_read node_json)
         echo -e "Using Node JSON file $node_json"
   else
-        node_json="/home/node-json"
-        echo -e "Default to Registry JSON file /home/node-json"
+        node_json="/home/node.json"
+        echo -e "Default to Registry JSON file /home/node.json"
   fi
 }
 
@@ -61,25 +61,26 @@ config_file="/home/container-config"
 # Get global parameters and set defaults
 do_params
 
-# Adjust registry-json to update/add "label" with relevant "$(hostname)" data
+# Adjust registry.json and node.json to update/add "label" with relevant "$(hostname)" data
 
 echo -e "\nChecking for update_label parameter"
 if cfg_haskey update_label && [ "$(cfg_read update_label)" = "TRUE" ]; then
 
-    # Update label field in registry-json
+    # Update label field in registry.json
 
     echo -e "Insert/Replace label: with $(hostname) hostname in $registry_json file"
-    jq --arg key "$(hostname)-registry" '. + {label: $key}' "$registry_json" > /home/registry-json.tmp
-    mv /home/registry-json.tmp $registry_json
+    jq --arg key "$(hostname)-registry" '. + {label: $key}' "$registry_json" > /home/registry.json.tmp
 
-    # Update label field in node-json
+    mv /home/registry.json.tmp $registry_json
+
+    # Update label field in node.json
 
     echo -e "Insert/Replace label: with $(hostname) hostname in $node_json file"
-    jq --arg key "$(hostname)-node" '. + {label: $key}' "$node_json" > /home/node-json.tmp
-    mv /home/node-json.tmp $node_json
+    jq --arg key "$(hostname)-node" '. + {label: $key}' "$node_json" > /home/node.json.tmp
+    mv /home/node.json.tmp $node_json
 fi
 
-# Adjust registry-json to update/add "ptp_domain_number" with relevant PTP Domain data if on a Mellanox switch
+# Adjust registry.json to update/add "ptp_domain_number" with relevant PTP Domain data if on a Mellanox switch
 
 echo -e "\nChecking for update_ptp_domain parameter"
 if cfg_haskey update_ptp_domain && [ "$(cfg_read update_ptp_domain)" = "TRUE" ]; then
@@ -106,8 +107,8 @@ if cfg_haskey update_ptp_domain && [ "$(cfg_read update_ptp_domain)" = "TRUE" ];
             echo -e "BC PTP Domain on Mellanox Switch is set to: $ptp_domain"
 
             echo -e "Insert/Replace ptp_domain_number: with $ptp_domain in $registry_json file"
-            jq --argjson key "$ptp_domain" '. + {ptp_domain_number: $key}' "$registry_json" > /home/registry-json.tmp
-            mv /home/registry-json.tmp $registry_json
+            jq --argjson key "$ptp_domain" '. + {ptp_domain_number: $key}' "$registry_json" > /home/registry.json.tmp
+            mv /home/registry.json.tmp $registry_json
 
         else
             # We got an ERROR from the Switch report why we had error
@@ -116,7 +117,7 @@ if cfg_haskey update_ptp_domain && [ "$(cfg_read update_ptp_domain)" = "TRUE" ];
         fi
     else
         # Not running on a Mellanox switch so report error
-        echo -e "updata_ptp_domain set but not running on a Mellanox switch - not updating ptp_domain_number in registry-json"
+        echo -e "updata_ptp_domain set but not running on a Mellanox switch - not updating ptp_domain_number in $registry_json"
     fi
     # Clean up /home/ptp_data file
     rm /home/ptp_data
