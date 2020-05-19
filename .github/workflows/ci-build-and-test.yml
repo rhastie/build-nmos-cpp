@@ -5,8 +5,12 @@ on:
     branches:
       - dev
 
+env:
+  SECRET_GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+  SECRET_RESULTS_SHEET_ID: ${{ secrets.RESULTS_SHEET_ID }}
+
 jobs:
-  docker-buildx-x86:
+  docker-buildx-x86-and-test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Dev branch
@@ -14,7 +18,7 @@ jobs:
         with:
           ref: dev
 
-      - name: Build and load x86 image
+      - name: Docker Buildx and load x86 image to Docker images
         uses: ilteoood/docker_buildx@master
         with:
           dockerfile: Dockerfile
@@ -29,6 +33,52 @@ jobs:
         shell: bash
         run: docker images
 
+      - name: Set environment variables
+        shell: bash
+        run: |
+          GITHUB_COMMIT=`echo "${{ github.sha }}" | cut -c1-7`
+          echo "::set-env name=GITHUB_COMMIT::$GITHUB_COMMIT"
+          GITHUB_BRANCH=`echo "${{ github.ref }}" | cut -d'/' -f3`
+          echo "::set-env name=GITHUB_BRANCH::$GITHUB_BRANCH"
+          echo "::set-env name=GITHUB_WORKSPACE::${{ github.workspace }}"
+          echo "::set-env name=RUNNER_WORKSPACE::${{ runner.workspace }}"
+          echo "::set-env name=BUILD_NAME::ubuntu-latest_avahi"
+
+      - name: Setup Google credentials
+        if: env.SECRET_GOOGLE_CREDENTIALS
+        shell: bash
+        working-directory: ${{ env.GITHUB_WORKSPACE }}
+        run: |
+          mkdir -p gdrive
+          echo "${{ env.SECRET_GOOGLE_CREDENTIALS }}" | openssl base64 -d -A -out gdrive/credentials.json
+          echo "::set-env name=GDRIVE_CREDENTIALS::`pwd`/gdrive/credentials.json"
+
+      - name: Get IP Host Address
+        run: |
+          sudo ip addr flush dev docker0 || echo "remove docker ip failed"
+          hostip=$(hostname -I | cut -f1 -d' ')
+          echo "::set-env name=HOST_IP_ADDRESS::$hostip"
+          ip address
+
+      - name: Ubuntu avahi setup
+        run: |
+          sudo apt-get install -f libavahi-compat-libdnssd-dev
+          # make avahi only respond on the "eth0" interface
+          sudo sed -i 's/#*allow-interfaces=.*/allow-interfaces=eth0/g' /etc/avahi/avahi-daemon.conf
+          sudo systemctl restart avahi-daemon
+
+      - name: Install python
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+
+      - name: Install pip
+        run: |
+          python -m pip install --upgrade pip
+
+      # - name: Pull Docker image
+      #   run: docker pull rhastie/nmos-cpp:dev
+
       - name: Configure node.json and registry.json files for tests and .local mDNS domain
         working-directory: ${{ env.RUNNER_WORKSPACE }}
         run: |
@@ -40,10 +90,166 @@ jobs:
         working-directory: ${{ env.RUNNER_WORKSPACE }}
         run: docker run -it -d --net=host --name nmos-cpp-node -v="$(pwd)/node.json:/home/node.json" -e "RUN_NODE=TRUE" rhastie/nmos-cpp:dev
 
+      - name: Install AMWA Test suite
+        shell: bash
+        working-directory: ${{ env.RUNNER_WORKSPACE }}
+        run:
+          |
+          set -x
+          root_dir=`pwd`
+
+          # Install AMWA test suite.
+          git clone https://github.com/AMWA-TV/nmos-testing.git
+          cd nmos-testing
+
+          # Create output directories
+          mkdir results
+          mkdir badges
+
+          # run test suite directly
+          pip install wheel
+          pip install -r requirements.txt
+
+          # Install SDPoker
+          sudo npm install -g AMWA-TV/sdpoker
+
+          pip install -r utilities/run-test-suites/gsheetsImport/requirements.txt
+
+      - name: Run AMWA Test suite against Node
+        shell: bash
+        working-directory: ${{ env.RUNNER_WORKSPACE }}
+        run:
+          |
+          set -x
+          root_dir=`pwd`
+
+          # Set AMWA Test suite runtime executable path
+          run_test="python nmos-test.py"
+
+          cd nmos-testing
+
+          function do_run_test() {
+            suite=$1
+            shift
+            case $($run_test suite ${suite} --selection all "$@" --output "results/${{ env.GITHUB_COMMIT }}-${{ env.BUILD_NAME }}-${{ env.GITHUB_BRANCH }}-${suite}.json" >> results/testoutput 2>&1; echo $?) in
+            [0-1])  echo "Pass" > badges/${suite}.txt ;;
+            *)      echo "Fail" > badges/${suite}.txt; echo "::set-env name=TEST_FAIL::TRUE" ;;
+            esac
+          }
+
+          do_run_test IS-04-01 --host "${{ env.HOST_IP_ADDRESS }}" --port 11000 --version v1.3
+
+          do_run_test IS-04-03 --host "${{ env.HOST_IP_ADDRESS }}" --port 11000 --version v1.3
+
+          do_run_test IS-05-01 --host "${{ env.HOST_IP_ADDRESS }}" --port 11000 --version v1.1
+
+          do_run_test IS-05-02 --host "${{ env.HOST_IP_ADDRESS }}" "${{ env.HOST_IP_ADDRESS }}" --port 11000 11000 --version v1.3 v1.1
+
+          do_run_test IS-07-01 --host "${{ env.HOST_IP_ADDRESS }}" --port 11000 --version v1.0
+
+          do_run_test IS-07-02 --host "${{ env.HOST_IP_ADDRESS }}" "${{ env.HOST_IP_ADDRESS }}" "${{ env.HOST_IP_ADDRESS }}" --port 11000 11000 11000 --version v1.3 v1.1 v1.0
+
+          do_run_test IS-09-02 --host "${{ env.HOST_IP_ADDRESS }}" null --port 0 0 --version null v1.0
+
+          exit 0
+
+      - name: Start Registry Docker container
+        working-directory: ${{ env.RUNNER_WORKSPACE }}
+        run: docker run -it -d --net=host --name nmos-cpp-registry -v="$(pwd)/registry.json:/home/registry.json" -e "RUN_NODE=FALSE" rhastie/nmos-cpp:dev
+
+      - name: Run AMWA Test suite against Registry
+        shell: bash
+        working-directory: ${{ env.RUNNER_WORKSPACE }}
+        run:
+          |
+          set -x
+          root_dir=`pwd`
+
+          # Set AMWA Test suite runtime executable path
+          run_test="python nmos-test.py"
+
+          cd nmos-testing
+
+          function do_run_test() {
+            suite=$1
+            shift
+            case $($run_test suite ${suite} --selection all "$@" --output "results/${{ env.GITHUB_COMMIT }}-${{ env.BUILD_NAME }}-${{ env.GITHUB_BRANCH }}-${suite}.json" >> results/testoutput 2>&1; echo $?) in
+            [0-1])  echo "Pass" > badges/${suite}.txt ;;
+            *)      echo "Fail" > badges/${suite}.txt; echo "::set-env name=TEST_FAIL::TRUE" ;;
+            esac
+          }
+
+          # short delay to give the Registry a chance to start up and the Node a chance to register before running the Registry test suite
+          sleep 2
+          # add a persistent Query WebSocket API subscription before running the Registry test suite
+          curl "http://localhost:8010/x-nmos/query/v1.3/subscriptions" -H "Content-Type: application/json" -d "{\"max_update_rate_ms\": 100, \"resource_path\": \"/nodes\", \"params\": {\"label\": \"host1\"}, \"persist\": true, \"secure\": false}"
+    
+          do_run_test IS-04-02 --host "${{ env.HOST_IP_ADDRESS }}" "${{ env.HOST_IP_ADDRESS }}" --port 8010 8010 --version v1.3 v1.3
+    
+          do_run_test IS-09-01 --host "${{ env.HOST_IP_ADDRESS }}" --port 8010 --version v1.0
+ 
+          exit 0
+
       - name: Stop Registry and Node containers
         shell: bash
         working-directory: ${{ env.RUNNER_WORKSPACE }}
         run:
           |
+          docker container stop nmos-cpp-registry
           docker container stop nmos-cpp-node
+          docker container rm nmos-cpp-registry
           docker container rm nmos-cpp-node
+
+      - name: Upload results to google sheets
+        working-directory: ${{ env.RUNNER_WORKSPACE }}
+        shell: bash
+        run: |
+          # Move to nmos-testing/results directory and operate relative to truncate "filenames in spreadsheet"
+          cd nmos-testing/results
+          export SHEET=https://docs.google.com/spreadsheets/d/${{ env.SECRET_RESULTS_SHEET_ID }}
+          python ../utilities/run-test-suites/gsheetsImport/resultsImporter.py --credentials ${{ env.GDRIVE_CREDENTIALS }} --sheet "$SHEET" --insert --json ${{ env.GITHUB_COMMIT }}-*.json || echo "upload failed"
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.BUILD_NAME }}_badges
+          path: ${{ runner.workspace }}/nmos-testing/badges
+    
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.BUILD_NAME }}_results
+          path: ${{ runner.workspace }}/nmos-testing/results
+    
+
+  make_badges:
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    needs: docker-buildx-x86-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: set environment variables
+        shell: bash
+        run: |
+          GITHUB_COMMIT=`echo "${{ github.sha }}" | cut -c1-7`
+          echo "::set-env name=GITHUB_COMMIT::$GITHUB_COMMIT"
+          echo "::set-env name=GITHUB_WORKSPACE::${{ github.workspace }}"
+          echo "::set-env name=RUNNER_WORKSPACE::${{ runner.workspace }}"
+
+      - uses: actions/download-artifact@v2
+        with:
+          path: ${{ runner.workspace }}/artifacts
+
+      - name: make badges
+        run: |
+          # combine badges from all builds
+          ${{ github.workspace }}/.github/scripts/make_badges.sh ${{ github.workspace }} ${{ runner.workspace }}/artifacts
+          # force push to github onto an orphan 'badges' branch
+          cd ${{ github.workspace }}
+          git checkout --orphan badges-${{ env.GITHUB_COMMIT }}
+          git rm -rfq --ignore-unmatch .
+          git add *.svg
+          git remote set-url --push `git remote` https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/${{ github.repository }}
+          git config --global user.name 'test-results-uploader'
+          git config --global user.email 'test-results-uploader@nmos-cpp.iam.gserviceaccount.com'
+          git commit -qm "Badges for README at ${{ env.GITHUB_COMMIT }}"
+          git push -f `git remote` badges-${{ env.GITHUB_COMMIT }}:badges
