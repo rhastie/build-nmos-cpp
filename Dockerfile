@@ -5,7 +5,7 @@ LABEL maintainer="richh@mellanox.com"
 ARG makemt
 
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn \
-    NMOS_CPP_VERSION=6434665c3414d6c785d3300e8b343ba7e03fade4
+    NMOS_CPP_VERSION=ae3356c2c7ee7213ffe439c0ac643a2fad4bc5c1
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -y --no-install-recommends \
     g++ build-essential \

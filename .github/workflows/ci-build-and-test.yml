@@ -1,0 +1,49 @@
+name: ci-build-and-test
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  docker-buildx-x86:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Dev branch
+        uses: actions/checkout@v2
+        with:
+          ref: dev
+
+      - name: Build and load x86 image
+        uses: ilteoood/docker_buildx@master
+        with:
+          dockerfile: Dockerfile
+          publish: false
+          load: true
+          imageName: rhastie/nmos-cpp
+          tag: dev
+          buildArg: makemt=3
+          platform: linux/amd64
+
+      - name: List docker images
+        shell: bash
+        run: docker images
+
+      - name: Configure node.json and registry.json files for tests and .local mDNS domain
+        working-directory: ${{ env.RUNNER_WORKSPACE }}
+        run: |
+          echo "{\"http_port\":11000, \"domain\":\"local.\", \"logging_level\":0}" > $(pwd)/node.json
+          echo "{\"http_port\":8010, \"domain\":\"local.\", \"logging_level\":0}" > $(pwd)/registry.json
+          cat $(pwd)/node.json $(pwd)/registry.json
+
+      - name: Start Node Docker container
+        working-directory: ${{ env.RUNNER_WORKSPACE }}
+        run: docker run -it -d --net=host --name nmos-cpp-node -v="$(pwd)/node.json:/home/node.json" -e "RUN_NODE=TRUE" rhastie/nmos-cpp:dev
+
+      - name: Stop Registry and Node containers
+        shell: bash
+        working-directory: ${{ env.RUNNER_WORKSPACE }}
+        run:
+          |
+          docker container stop nmos-cpp-node
+          docker container rm nmos-cpp-node
