@@ -1,9 +1,11 @@
 name: ci-build-and-test
 
 on:
-  push:
-    branches:
-      - dev
+  push: 
+    branches: [dev, master]
+
+  pull_request:
+    branches: [dev, master]
 
 env:
   SECRET_GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
@@ -15,34 +17,33 @@ jobs:
     steps:
       - name: Checkout Dev branch
         uses: actions/checkout@v2
-        with:
-          ref: dev
-
-      - name: Docker Buildx and load x86 image to Docker images
-        uses: ilteoood/docker_buildx@master
-        with:
-          dockerfile: Dockerfile
-          publish: false
-          load: true
-          imageName: rhastie/nmos-cpp
-          tag: dev
-          buildArg: makemt=3
-          platform: linux/amd64
-
-      - name: List docker images
-        shell: bash
-        run: docker images
 
       - name: Set environment variables
         shell: bash
         run: |
-          GITHUB_COMMIT=`echo "${{ github.sha }}" | cut -c1-7`
+          GITHUB_COMMIT=`sed -n 's/.*NMOS_CPP_VERSION=\(.......\).*/\1/p' Dockerfile`
           echo "::set-env name=GITHUB_COMMIT::$GITHUB_COMMIT"
           GITHUB_BRANCH=`echo "${{ github.ref }}" | cut -d'/' -f3`
           echo "::set-env name=GITHUB_BRANCH::$GITHUB_BRANCH"
           echo "::set-env name=GITHUB_WORKSPACE::${{ github.workspace }}"
           echo "::set-env name=RUNNER_WORKSPACE::${{ runner.workspace }}"
           echo "::set-env name=BUILD_NAME::ubuntu-latest_avahi"
+          echo "::set-env name=TEST_FAIL::FALSE"
+
+      - name: Set platforms and tags
+        shell: bash
+        run: |
+          if [[ "${{ secrets.BUILD_ARM }}" == "TRUE" ]] && [[ "${{ env.GITHUB_BRANCH }}" == "master" ]]; then 
+            echo "::set-env name=BUILD_PLATFORMS::linux/amd64,linux/arm64,linux/arm/v7"
+          else
+            echo "::set-env name=BUILD_PLATFORMS::linux/amd64"
+          fi
+
+          if [[ "${{ env.GITHUB_BRANCH }}" == "master" ]]; then
+            echo "::set-env name=BUILD_TAGS::${{ env.GITHUB_BRANCH }}-${{ env.GITHUB_COMMIT }}, latest"
+          else
+            echo "::set-env name=BUILD_TAGS::${{ env.GITHUB_BRANCH }}-${{ env.GITHUB_COMMIT }}"
+          fi
 
       - name: Setup Google credentials
         if: env.SECRET_GOOGLE_CREDENTIALS
@@ -55,10 +56,28 @@ jobs:
 
       - name: Get IP Host Address
         run: |
-          sudo ip addr flush dev docker0 || echo "remove docker ip failed"
-          hostip=$(hostname -I | cut -f1 -d' ')
+          hostip=$(ip -4 addr show eth0 | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
           echo "::set-env name=HOST_IP_ADDRESS::$hostip"
+          echo "Using HOST IP Address: $hostip"
           ip address
+
+      - name: Available Docker Buildx platforms
+        run: echo ${{ steps.buildx.outputs.platforms }}
+
+      - name: Docker Buildx and load x86 image to Docker images
+        uses: ilteoood/docker_buildx@master
+        with:
+          dockerfile: Dockerfile
+          publish: false
+          load: true
+          imageName: rhastie/nmos-cpp
+          tag: ${{ env.GITHUB_BRANCH }}
+          buildArg: makemt=3
+          platform: linux/amd64
+
+      - name: List docker images
+        shell: bash
+        run: docker images
 
       - name: Ubuntu avahi setup
         run: |
@@ -76,9 +95,6 @@ jobs:
         run: |
           python -m pip install --upgrade pip
 
-      # - name: Pull Docker image
-      #   run: docker pull rhastie/nmos-cpp:dev
-
       - name: Configure node.json and registry.json files for tests and .local mDNS domain
         working-directory: ${{ env.RUNNER_WORKSPACE }}
         run: |
@@ -86,9 +102,12 @@ jobs:
           echo "{\"http_port\":8010, \"domain\":\"local.\", \"logging_level\":0}" > $(pwd)/registry.json
           cat $(pwd)/node.json $(pwd)/registry.json
 
+      - name: Remove IP Address from Docker0 to force AMWA Test Suite mDNS to use eth0
+        run: sudo ip address del 172.17.0.1/16 dev docker0 || echo "Docker IP Address del failed"
+
       - name: Start Node Docker container
         working-directory: ${{ env.RUNNER_WORKSPACE }}
-        run: docker run -it -d --net=host --name nmos-cpp-node -v="$(pwd)/node.json:/home/node.json" -e "RUN_NODE=TRUE" rhastie/nmos-cpp:dev
+        run: docker run -it -d --net=host --name nmos-cpp-node -v="$(pwd)/node.json:/home/node.json" -e "RUN_NODE=TRUE" rhastie/nmos-cpp:${{ env.GITHUB_BRANCH }}
 
       - name: Install AMWA Test suite
         shell: bash
@@ -151,11 +170,13 @@ jobs:
 
           do_run_test IS-09-02 --host "${{ env.HOST_IP_ADDRESS }}" null --port 0 0 --version null v1.0
 
+          echo ${{ env.TEST_FAIL }}
+
           exit 0
 
       - name: Start Registry Docker container
         working-directory: ${{ env.RUNNER_WORKSPACE }}
-        run: docker run -it -d --net=host --name nmos-cpp-registry -v="$(pwd)/registry.json:/home/registry.json" -e "RUN_NODE=FALSE" rhastie/nmos-cpp:dev
+        run: docker run -it -d --net=host --name nmos-cpp-registry -v="$(pwd)/registry.json:/home/registry.json" -e "RUN_NODE=FALSE" rhastie/nmos-cpp:${{ env.GITHUB_BRANCH }}
 
       - name: Run AMWA Test suite against Registry
         shell: bash
@@ -180,7 +201,7 @@ jobs:
           }
 
           # short delay to give the Registry a chance to start up and the Node a chance to register before running the Registry test suite
-          sleep 2
+          sleep 12
           # add a persistent Query WebSocket API subscription before running the Registry test suite
           curl "http://localhost:8010/x-nmos/query/v1.3/subscriptions" -H "Content-Type: application/json" -d "{\"max_update_rate_ms\": 100, \"resource_path\": \"/nodes\", \"params\": {\"label\": \"host1\"}, \"persist\": true, \"secure\": false}"
     
@@ -188,6 +209,8 @@ jobs:
     
           do_run_test IS-09-01 --host "${{ env.HOST_IP_ADDRESS }}" --port 8010 --version v1.0
  
+          echo ${{ env.TEST_FAIL }}
+
           exit 0
 
       - name: Stop Registry and Node containers
@@ -200,6 +223,26 @@ jobs:
           docker container rm nmos-cpp-registry
           docker container rm nmos-cpp-node
 
+      - name: Re-add IP address for Docker0 interface
+        run:
+          |
+          sudo ip address add 172.17.0.1/16 broadcast 172.17.255.255 dev docker0 || echo "Docker IP Address add failed"
+          ip address
+          
+      - name: If Passes tests, Docker Buildx and publish x86 image to Docker Hub
+        if: env.TEST_FAIL == 'FALSE'
+        uses: ilteoood/docker_buildx@master
+        with:
+          dockerfile: Dockerfile
+          publish: true
+          load: false
+          imageName: rhastie/nmos-cpp
+          tag: ${{ env.BUILD_TAGS }}
+          buildArg: makemt=3
+          platform: ${{ env.BUILD_PLATFORMS }}
+          dockerHubUser: ${{ secrets.DockerHub_User }}
+          dockerHubPassword: ${{ secrets.DockerHub_Password }}
+
       - name: Upload results to google sheets
         working-directory: ${{ env.RUNNER_WORKSPACE }}
         shell: bash
@@ -209,12 +252,31 @@ jobs:
           export SHEET=https://docs.google.com/spreadsheets/d/${{ env.SECRET_RESULTS_SHEET_ID }}
           python ../utilities/run-test-suites/gsheetsImport/resultsImporter.py --credentials ${{ env.GDRIVE_CREDENTIALS }} --sheet "$SHEET" --insert --json ${{ env.GITHUB_COMMIT }}-*.json || echo "upload failed"
 
-      - uses: actions/upload-artifact@v2
+      - name: If Passes tests, build image file of x86 container
+        if: env.TEST_FAIL == 'FALSE'
+        working-directory: ${{ env.RUNNER_WORKSPACE }}
+        shell: bash
+        run: |
+          # Make directory and build image from container in Docker image repository
+          mkdir container-image
+          cd container-image
+          docker save rhastie/nmos-cpp:${{ env.GITHUB_BRANCH }}| gzip > nmos-cpp_${{ env.GITHUB_BRANCH }}-${{ env.GITHUB_COMMIT }}.img.tar.gz
+
+      - name: If Passes tests, upload container image as an artifact
+        if: env.TEST_FAIL == 'FALSE'
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.BUILD_NAME }}_container 
+          path: ${{ runner.workspace }}/container-image/nmos-cpp_${{ env.GITHUB_BRANCH }}-${{ env.GITHUB_COMMIT }}.img.tar.gz
+
+      - name: Upload badges as artifacts
+        uses: actions/upload-artifact@v2
         with:
           name: ${{ env.BUILD_NAME }}_badges
           path: ${{ runner.workspace }}/nmos-testing/badges
     
-      - uses: actions/upload-artifact@v2
+      - name: Upload results as artifacts
+        uses: actions/upload-artifact@v2
         with:
           name: ${{ env.BUILD_NAME }}_results
           path: ${{ runner.workspace }}/nmos-testing/results

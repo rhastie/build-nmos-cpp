@@ -30,7 +30,7 @@ The nmos-cpp container includes implementations of the NMOS Node, Registration a
 
 ## JT-NM Tested
 
-[<img alt="JT-NM Tested 03/20 NMOS & TR-1001-1 Controller" src="https://jt-nm.org/images/jt-nm-tested_2020/jt-nm-tested_NMOS-CONTROLLERS_03-20_badge-lores.png" height="120" align="right"/>](https://jt-nm.org/jt-nm_tested/)[<img alt="JT-NM Tested 03/20 NMOS & TR-1001-1" src="https://jt-nm.org/images/jt-nm-tested_2020/jt-nm_self-tested_NMOS-TR_03-20_badge-lores.png" height="120" align="right"/>](https://jt-nm.org/jt-nm_tested/)
+[<img alt="JT-NM Tested 03/20 NMOS & TR-1001-1 Controller" src="images/jt-nm-org_tested_NMOS-TR-CONTROLLERS_03-20_badge.png?raw=true" height="120" align="right"/>](https://jt-nm.org/jt-nm_tested/)[<img alt="JT-NM Tested 03/20 NMOS & TR-1001-1" src="images/jt-nm-org_self-tested_NMOS-TR_03-20_badge.png?raw=true" height="120" align="right"/>](https://jt-nm.org/jt-nm_tested/)
 
 The Mellanox docker container has now passed the stringent testing required by JT-NM for both Registries and Controllers. The container was tested whilst running on a Mellanox Spectrum/Spectrum-2 switch using the Onyx Docker subsystem. You can access the [JT-NM testing matrix here](https://www.jt-nm.org/documents/JT-NM_Tested_Catalog_NMOS-TR-1001_Full-Online-2020-05-12.pdf).
 
