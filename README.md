@@ -1,5 +1,7 @@
 # AMWA NMOS Containerised Registry, Browser Client/Controller and Node
 
+**Build status:** [![ci-build-test-publish](https://github.com/rhastie/build-nmos-cpp/workflows/ci-build-test-publish/badge.svg)](https://github.com/rhastie/build-nmos-cpp/actions?query=workflow%3Aci-build-test-publish)
+
 ## Implementation Overview
 
 This repository contains all the files needed to create a Dockerised container implementation of the AMWA Networked Media Open Specifications. For more information about AMWA, NMOS and the Networked Media Incubator, please refer to http://amwa.tv/.
@@ -28,15 +30,17 @@ Additionally it supports the following additional components:
 
 The nmos-cpp container includes implementations of the NMOS Node, Registration and Query APIs, and the NMOS Connection API. It also included a NMOS Browser Client/Controller in JavaScript and a DNS-SD API which aren't part of the specifications.
 
-## JT-NM Tested
+## Container Testing and supported architectures
+
+### JT-NM Tested
 
 [<img alt="JT-NM Tested 03/20 NMOS & TR-1001-1 Controller" src="images/jt-nm-org_tested_NMOS-TR-CONTROLLERS_03-20_badge.png?raw=true" height="120" align="right"/>](https://jt-nm.org/jt-nm_tested/)[<img alt="JT-NM Tested 03/20 NMOS & TR-1001-1" src="images/jt-nm-org_self-tested_NMOS-TR_03-20_badge.png?raw=true" height="120" align="right"/>](https://jt-nm.org/jt-nm_tested/)
 
-The Mellanox docker container has now passed the stringent testing required by JT-NM for both Registries and Controllers. The container was tested whilst running on a Mellanox Spectrum/Spectrum-2 switch using the Onyx Docker subsystem. You can access the [JT-NM testing matrix here](https://www.jt-nm.org/documents/JT-NM_Tested_Catalog_NMOS-TR-1001_Full-Online-2020-05-12.pdf).
+The Mellanox NMOS docker container has now passed the stringent testing required by JT-NM for both Registries and Controllers. The container was tested whilst running on a Mellanox Spectrum/Spectrum-2 switch using the Onyx Docker subsystem. You can access the [JT-NM testing matrix here](https://www.jt-nm.org/documents/JT-NM_Tested_Catalog_NMOS-TR-1001_Full-Online-2020-05-12.pdf).
 
 In addition, the container has been successfully tested in AMWA Networked Media Incubator workshops.
 
-## Tested Platforms and CPU Architectures
+### Tested Platforms and supported CPU Architectures
 
 The Dockfile in this repository is designed so that if needed it can be run under the Docker Experimental BuildX CLI feature set. The container is published for the follow CPU Architectures:
 
@@ -51,6 +55,52 @@ The container has been tested on the following platforms for compatibility:
 - NVIDIA Jetson AGX Xavier Developer Kit (even though not tested the container should function on all NVIDIA AGX platforms)
 - Raspberry Pi RPi 3 Model B and RPi 4 Model B (both Raspbian's standard 32-bit and the new experimental 64-bit kernels have been tested)
 - Standard Intel and AMD Servers running the container under Ubuntu Linux - Both bare-metal and virtualised environments have been tested. 
+
+### Continuous Integration (CI) Testing
+
+The Mellanox NMOS container, like the NMOS Specifications, is intended to be always ready, but continually developing.
+To ease development overheads and to continually validate the status of the container it now undergoes CI Teating via GitHub Actions.
+This CI testing is meant as a sanity check around the container functionality rather than extensive testing of nmos-cpp functionality itself.
+Please see wider [Sony CI Testing](https://github.com/sony/nmos-cpp/blob/master/README.md#build-status) for deeper testing on nmos-cpp.
+
+The following configuration, defined by the [ci-build-test-publish](.github/workflows/ci-build-test-publish.yml) job, is built and unit tested automatically via continuous integration. If the tests complete successfully the container is published directly to Docker Hub and also saved as an artifact against the GitHub Action Job. Additional configurations may be added in the future.
+
+| Platform | Version                  | Configuration Options                  |
+|----------|--------------------------|----------------------------------------|
+| Linux    | Ubuntu 18.04 (GCC 7.5.0) | Avahi                                  |
+
+The [AMWA NMOS API Testing Tool](https://github.com/AMWA-TV/nmos-testing) is automatically run against the built **NMOS container** operating in both "nmos-node" and "nmos-registry" configurations.
+
+**Test Suite Result/Status:**
+
+[![IS-04-01][IS-04-01-badge]][IS-04-01-sheet]
+[![IS-04-02][IS-04-02-badge]][IS-04-02-sheet]
+[![IS-04-03][IS-04-03-badge]][IS-04-03-sheet]
+[![IS-05-01][IS-05-01-badge]][IS-05-01-sheet]
+[![IS-05-02][IS-05-02-badge]][IS-05-02-sheet]
+[![IS-07-01][IS-07-01-badge]][IS-07-01-sheet]
+[![IS-07-02][IS-07-02-badge]][IS-07-02-sheet]
+[![IS-09-01][IS-09-01-badge]][IS-09-01-sheet]
+[![IS-09-02][IS-09-02-badge]][IS-09-02-sheet]
+
+[IS-04-01-badge]: https://github.com/rhastie/build-nmos-cpp/blob/badges/IS-04-01.svg?raw=true
+[IS-04-02-badge]: https://github.com/rhastie/build-nmos-cpp/blob/badges/IS-04-02.svg?raw=true
+[IS-04-03-badge]: https://github.com/rhastie/build-nmos-cpp/blob/badges/IS-04-03.svg?raw=true
+[IS-05-01-badge]: https://github.com/rhastie/build-nmos-cpp/blob/badges/IS-05-01.svg?raw=true
+[IS-05-02-badge]: https://github.com/rhastie/build-nmos-cpp/blob/badges/IS-05-02.svg?raw=true
+[IS-07-01-badge]: https://github.com/rhastie/build-nmos-cpp/blob/badges/IS-07-01.svg?raw=true
+[IS-07-02-badge]: https://github.com/rhastie/build-nmos-cpp/blob/badges/IS-07-02.svg?raw=true
+[IS-09-01-badge]: https://github.com/rhastie/build-nmos-cpp/blob/badges/IS-09-01.svg?raw=true
+[IS-09-02-badge]: https://github.com/rhastie/build-nmos-cpp/blob/badges/IS-09-02.svg?raw=true
+[IS-04-01-sheet]: https://docs.google.com/spreadsheets/d/1xtxALyCpr5cR4zHwjnW12b8wAOf2uvL0QBLFCPgdE1A/edit#gid=0
+[IS-04-02-sheet]: https://docs.google.com/spreadsheets/d/1xtxALyCpr5cR4zHwjnW12b8wAOf2uvL0QBLFCPgdE1A/edit#gid=1838684224
+[IS-04-03-sheet]: https://docs.google.com/spreadsheets/d/1xtxALyCpr5cR4zHwjnW12b8wAOf2uvL0QBLFCPgdE1A/edit#gid=1174955447
+[IS-05-01-sheet]: https://docs.google.com/spreadsheets/d/1xtxALyCpr5cR4zHwjnW12b8wAOf2uvL0QBLFCPgdE1A/edit#gid=517163955
+[IS-05-02-sheet]: https://docs.google.com/spreadsheets/d/1xtxALyCpr5cR4zHwjnW12b8wAOf2uvL0QBLFCPgdE1A/edit#gid=205041321
+[IS-07-01-sheet]: https://docs.google.com/spreadsheets/d/1xtxALyCpr5cR4zHwjnW12b8wAOf2uvL0QBLFCPgdE1A/edit#gid=828991990
+[IS-07-02-sheet]: https://docs.google.com/spreadsheets/d/1xtxALyCpr5cR4zHwjnW12b8wAOf2uvL0QBLFCPgdE1A/edit#gid=367400040
+[IS-09-01-sheet]: https://docs.google.com/spreadsheets/d/1xtxALyCpr5cR4zHwjnW12b8wAOf2uvL0QBLFCPgdE1A/edit#gid=919453974
+[IS-09-02-sheet]: https://docs.google.com/spreadsheets/d/1xtxALyCpr5cR4zHwjnW12b8wAOf2uvL0QBLFCPgdE1A/edit#gid=2135469955
 
 ## How to install and run the container NMOS Registry/Controller
 

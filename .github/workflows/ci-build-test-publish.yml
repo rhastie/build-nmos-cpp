@@ -1,4 +1,4 @@
-name: ci-build-and-test
+name: ci-build-test-publish
 
 on:
   push: 
@@ -12,7 +12,7 @@ env:
   SECRET_RESULTS_SHEET_ID: ${{ secrets.RESULTS_SHEET_ID }}
 
 jobs:
-  docker-buildx-x86-and-test:
+  docker-buildx-test-publish:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Dev branch
@@ -283,8 +283,8 @@ jobs:
     
 
   make_badges:
-    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-    needs: docker-buildx-x86-and-test
+    # if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    needs: docker-buildx-test-publish
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
