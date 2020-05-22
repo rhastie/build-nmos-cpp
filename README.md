@@ -42,7 +42,7 @@ In addition, the container has been successfully tested in AMWA Networked Media 
 
 ### Tested Platforms and supported CPU Architectures
 
-The Dockfile in this repository is designed so that if needed it can be run under the Docker Experimental BuildX CLI feature set. The container is published for the follow CPU Architectures:
+The Dockerfile in this repository is designed so that if needed it can be run under the Docker Experimental BuildX CLI feature set. The container is published for the follow CPU Architectures:
 
 - Intel and AMD x86_86 64-bit architectures
 - ARMv8 AArch64 (64-bit ARM architecture)
@@ -59,7 +59,7 @@ The container has been tested on the following platforms for compatibility:
 ### Continuous Integration (CI) Testing
 
 The Mellanox NMOS container, like the NMOS Specifications, is intended to be always ready, but continually developing.
-To ease development overheads and to continually validate the status of the container it now undergoes CI Teating via GitHub Actions.
+To ease development overheads and to continually validate the status of the container it now undergoes CI Testing via GitHub Actions.
 This CI testing is meant as a sanity check around the container functionality rather than extensive testing of nmos-cpp functionality itself.
 Please see wider [Sony CI Testing](https://github.com/sony/nmos-cpp/blob/master/README.md#build-status) for deeper testing on nmos-cpp.
 

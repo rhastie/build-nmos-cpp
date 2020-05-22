@@ -15,7 +15,7 @@ jobs:
   docker-buildx-test-publish:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Dev branch
+      - name: Checkout branch
         uses: actions/checkout@v2
 
       - name: Set environment variables
@@ -40,7 +40,8 @@ jobs:
           fi
 
           if [[ "${{ env.GITHUB_BRANCH }}" == "master" ]]; then
-            echo "::set-env name=BUILD_TAGS::${{ env.GITHUB_BRANCH }}-${{ env.GITHUB_COMMIT }}, latest"
+            # echo "::set-env name=BUILD_TAGS::${{ env.GITHUB_BRANCH }}-${{ env.GITHUB_COMMIT }}, latest"
+            echo "::set-env name=BUILD_TAGS::${{ env.GITHUB_BRANCH }}-${{ env.GITHUB_COMMIT }}"
           else
             echo "::set-env name=BUILD_TAGS::${{ env.GITHUB_BRANCH }}-${{ env.GITHUB_COMMIT }}"
           fi
@@ -98,14 +99,14 @@ jobs:
       - name: Configure node.json and registry.json files for tests and .local mDNS domain
         working-directory: ${{ env.RUNNER_WORKSPACE }}
         run: |
-          echo "{\"http_port\":11000, \"domain\":\"local.\", \"logging_level\":0}" > $(pwd)/node.json
-          echo "{\"http_port\":8010, \"domain\":\"local.\", \"logging_level\":0}" > $(pwd)/registry.json
+          echo "{\"pri\":0, \"http_port\":11000, \"domain\":\"local.\", \"logging_level\":0}" > $(pwd)/node.json
+          echo "{\"pri\":0, \"http_port\":8010, \"domain\":\"local.\", \"logging_level\":0}" > $(pwd)/registry.json
           cat $(pwd)/node.json $(pwd)/registry.json
 
       - name: Remove IP Address from Docker0 to force AMWA Test Suite mDNS to use eth0
         run: sudo ip address del 172.17.0.1/16 dev docker0 || echo "Docker IP Address del failed"
 
-      - name: Start Node Docker container
+      - name: Start Node Docker container for Node tests
         working-directory: ${{ env.RUNNER_WORKSPACE }}
         run: docker run -it -d --net=host --name nmos-cpp-node -v="$(pwd)/node.json:/home/node.json" -e "RUN_NODE=TRUE" rhastie/nmos-cpp:${{ env.GITHUB_BRANCH }}
 
@@ -174,9 +175,14 @@ jobs:
 
           exit 0
 
-      - name: Start Registry Docker container
+      - name: Start Registry Docker container and re-start Node Docker container for Registry tests
         working-directory: ${{ env.RUNNER_WORKSPACE }}
-        run: docker run -it -d --net=host --name nmos-cpp-registry -v="$(pwd)/registry.json:/home/registry.json" -e "RUN_NODE=FALSE" rhastie/nmos-cpp:${{ env.GITHUB_BRANCH }}
+        run: |
+          docker container stop nmos-cpp-node
+          docker container rm nmos-cpp-node
+          docker run -it -d --net=host --name nmos-cpp-registry -v="$(pwd)/registry.json:/home/registry.json" -e "RUN_NODE=FALSE" rhastie/nmos-cpp:${{ env.GITHUB_BRANCH }}
+          sleep 5
+          docker run -it -d --net=host --name nmos-cpp-node -v="$(pwd)/node.json:/home/node.json" -e "RUN_NODE=TRUE" rhastie/nmos-cpp:${{ env.GITHUB_BRANCH }}
 
       - name: Run AMWA Test suite against Registry
         shell: bash
@@ -201,7 +207,7 @@ jobs:
           }
 
           # short delay to give the Registry a chance to start up and the Node a chance to register before running the Registry test suite
-          sleep 12
+          sleep 2
           # add a persistent Query WebSocket API subscription before running the Registry test suite
           curl "http://localhost:8010/x-nmos/query/v1.3/subscriptions" -H "Content-Type: application/json" -d "{\"max_update_rate_ms\": 100, \"resource_path\": \"/nodes\", \"params\": {\"label\": \"host1\"}, \"persist\": true, \"secure\": false}"
     
