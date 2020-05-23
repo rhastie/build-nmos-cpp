@@ -258,6 +258,14 @@ jobs:
           export SHEET=https://docs.google.com/spreadsheets/d/${{ env.SECRET_RESULTS_SHEET_ID }}
           python ../utilities/run-test-suites/gsheetsImport/resultsImporter.py --credentials ${{ env.GDRIVE_CREDENTIALS }} --sheet "$SHEET" --insert --json ${{ env.GITHUB_COMMIT }}-*.json || echo "upload failed"
 
+      - name: If Passes tests and branch == master, update Docker Hub README file using GitHub README.md
+        # if: env.TEST_FAIL == 'FALSE' && env.GITHUB_BRANCH == 'master'
+        uses: meeDamian/sync-readme@v1.0.6
+        with:
+          user: ${{ secrets.DockerHub_User }}
+          pass: ${{ secrets.DockerHub_Password }}
+          slug: rhastie/nmos-cpp
+
       - name: If Passes tests, build image file of x86 container
         if: env.TEST_FAIL == 'FALSE'
         working-directory: ${{ env.RUNNER_WORKSPACE }}
@@ -288,7 +296,7 @@ jobs:
           path: ${{ runner.workspace }}/nmos-testing/results
     
 
-  make_badges:
+  make-badges:
     # if: github.ref == 'refs/heads/master' && github.event_name == 'push'
     needs: docker-buildx-test-publish
     runs-on: ubuntu-latest
