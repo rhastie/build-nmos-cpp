@@ -33,6 +33,7 @@ jobs:
       - name: Set platforms and tags
         shell: bash
         run: |
+          # BUILD_ARM currently is set to FALSE - GitHub Actions only allows 6 hours for Job completion which isn't enough
           if [[ "${{ secrets.BUILD_ARM }}" == "TRUE" ]] && [[ "${{ env.GITHUB_BRANCH }}" == "master" ]]; then 
             echo "::set-env name=BUILD_PLATFORMS::linux/amd64,linux/arm64,linux/arm/v7"
           else
@@ -259,7 +260,7 @@ jobs:
           python ../utilities/run-test-suites/gsheetsImport/resultsImporter.py --credentials ${{ env.GDRIVE_CREDENTIALS }} --sheet "$SHEET" --insert --json ${{ env.GITHUB_COMMIT }}-*.json || echo "upload failed"
 
       - name: If Passes tests and branch == master, update Docker Hub README file using GitHub README.md
-        # if: env.TEST_FAIL == 'FALSE' && env.GITHUB_BRANCH == 'master'
+        if: env.TEST_FAIL == 'FALSE' && env.GITHUB_BRANCH == 'master'
         uses: meeDamian/sync-readme@v1.0.6
         with:
           user: ${{ secrets.DockerHub_User }}
@@ -297,7 +298,7 @@ jobs:
     
 
   make-badges:
-    # if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
     needs: docker-buildx-test-publish
     runs-on: ubuntu-latest
     steps:
