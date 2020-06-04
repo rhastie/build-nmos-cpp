@@ -1,6 +1,6 @@
 # AMWA NMOS Containerised Registry, Browser Client/Controller and Node
 
-**Build status:** [![ci-build-test-publish](https://github.com/rhastie/build-nmos-cpp/workflows/ci-build-test-publish/badge.svg)](https://github.com/rhastie/build-nmos-cpp/actions?query=workflow%3Aci-build-test-publish)
+**Build status:** [![ci-build-test-publish](https://github.com/rhastie/build-nmos-cpp/workflows/ci-build-test-publish/badge.svg?branch=master)](https://github.com/rhastie/build-nmos-cpp/actions?query=workflow%3Aci-build-test-publish)
 
 ## Implementation Overview
 
