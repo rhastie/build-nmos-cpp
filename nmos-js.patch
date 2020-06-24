@@ -1,35 +1,59 @@
 diff -ruN nmos-js/Development/public/index.html nmos-js.new/Development/public/index.html
---- nmos-js/Development/public/index.html	2020-02-07 17:17:40.382416432 +0000
-+++ nmos-js.new/Development/public/index.html	2020-02-18 15:32:35.581542348 +0000
+--- nmos-js/Development/public/index.html	2020-06-24 08:32:47.129957884 -0700
++++ nmos-js.new/Development/public/index.html	2020-06-24 08:32:23.982628575 -0700
 @@ -18,7 +18,7 @@
        work correctly both with client-side routing and a non-root public URL.
        Learn how to configure a non-root public URL by running `npm run build`.
      -->
 -    <title>nmos-js client</title>
-+    <title>Mellanox NMOS Controller</title>
++    <title>NVIDIA NMOS Commissioning Controller</title>
    </head>
    <body>
      <noscript>
 diff -ruN nmos-js/Development/public/manifest.json nmos-js.new/Development/public/manifest.json
---- nmos-js/Development/public/manifest.json	2020-02-07 17:17:40.382416432 +0000
-+++ nmos-js.new/Development/public/manifest.json	2020-02-18 15:33:04.005222946 +0000
+--- nmos-js/Development/public/manifest.json	2020-06-24 08:32:47.129957884 -0700
++++ nmos-js.new/Development/public/manifest.json	2020-06-24 08:32:23.982628575 -0700
 @@ -1,6 +1,6 @@
  {
    "short_name": "nmos-js",
 -  "name": "nmos-js client",
-+  "name": "Mellanox NMOS Controller",
++  "name": "NVIDIA NMOS Commissioning Controller",
    "start_url": "./index.html",
    "display": "standalone",
    "theme_color": "#2196f3",
+diff -ruN nmos-js/Development/src/index.css nmos-js.new/Development/src/index.css
+--- nmos-js/Development/src/index.css	2020-06-24 08:32:47.129957884 -0700
++++ nmos-js.new/Development/src/index.css	2020-06-24 08:35:30.744907266 -0700
+@@ -36,7 +36,7 @@
+ }
+ 
+ .addFilter.blue{
+-  color: rgb(33, 150, 243);
++  color: rgb(118, 185, 0);
+ }
+ 
+ .inverted {
+diff -ruN nmos-js/Development/src/pages/nodes/NodesShow.js nmos-js.new/Development/src/pages/nodes/NodesShow.js
+--- nmos-js/Development/src/pages/nodes/NodesShow.js	2020-06-24 08:32:47.133957768 -0700
++++ nmos-js.new/Development/src/pages/nodes/NodesShow.js	2020-06-24 08:34:46.226322202 -0700
+@@ -99,7 +99,7 @@
+                                     >
+                                         <LinkIcon
+                                             style={{
+-                                                color: '#2196f3',
++                                                color: '#76b900',
+                                                 preserveAspectRatio: 'xMidYMin',
+                                             }}
+                                         />
 diff -ruN nmos-js/Development/src/pages/settings.js nmos-js.new/Development/src/pages/settings.js
---- nmos-js/Development/src/pages/settings.js	2020-02-07 17:17:40.386416409 +0000
-+++ nmos-js.new/Development/src/pages/settings.js	2020-02-19 16:09:18.866463400 +0000
+--- nmos-js/Development/src/pages/settings.js	2020-06-24 08:32:47.133957768 -0700
++++ nmos-js.new/Development/src/pages/settings.js	2020-06-24 08:32:23.982628575 -0700
 @@ -16,7 +16,7 @@
  import Cookies from 'universal-cookie';
  import SaveIcon from '@material-ui/icons/Save';
  
 -import sealion from '../assets/sea-lion.png';
-+import sealion from '../assets/mellanox-logo-horizontal-blue.png';
++import sealion from '../assets/NVIDIA_Logo_H_ForScreen_ForLightBG.png';
  import { changeAPIEndpoint, changePaging } from '../dataProvider';
  
  const cookies = new Cookies();
@@ -47,7 +71,7 @@ diff -ruN nmos-js/Development/src/pages/settings.js nmos-js.new/Development/src/
              <Card>
                  <CardHeader
 -                    title="Welcome to the nmos&#8209;js Client"
-+                    title="Mellanox NMOS Commissioning Controller"
++                    title="NVIDIA NMOS Commissioning Controller"
                      titleTypographyProps={{ variant: 'h2', align: 'center' }}
                  />
                  <CardContent align="center">
@@ -60,12 +84,41 @@ diff -ruN nmos-js/Development/src/pages/settings.js nmos-js.new/Development/src/
 +                            backgroundColor: 'white',
                              padding: '4px',
 -                            width: '20%',
-+                            width: '50%',
++                            width: '40%',
                          }}
 -                        alt="sea-lion logo"
-+                        alt="Mellanox logo"
++                        alt="NVIDIA Logo"
                      />
 +                    <p>Built using open-source code from projects <a href="https://github.com/sony/nmos-cpp">nmos-cpp</a> and <a href="https://github.com/sony/nmos-js">nmos-js</a></p>
                  </CardContent>
              </Card>
              <Card align="center" title="Change Query">
+diff -ruN nmos-js/Development/src/theme/ThemeContext.js nmos-js.new/Development/src/theme/ThemeContext.js
+--- nmos-js/Development/src/theme/ThemeContext.js	2020-06-24 08:32:47.133957768 -0700
++++ nmos-js.new/Development/src/theme/ThemeContext.js	2020-06-24 09:58:40.942242629 -0700
+@@ -1,7 +1,7 @@
+ import React from 'react';
+ import { ThemeProvider } from '@material-ui/styles';
+ import { createMuiTheme, responsiveFontSizes } from '@material-ui/core/styles';
+-import { blue, lightBlue } from '@material-ui/core/colors';
++//import { blue, lightBlue } from '@material-ui/core/colors';
+ import Cookies from 'universal-cookie';
+ 
+ const cookies = new Cookies();
+@@ -20,8 +20,14 @@
+     const theme = responsiveFontSizes(
+         createMuiTheme({
+             palette: {
+-                primary: lightBlue,
+-                secondary: blue,
++                primary: {
++                    main: '#76b900',
++                    contrastText: '#ffffff'
++                },
++                secondary: {
++                    main: '#76b900',
++                    contrastText: '#ffffff'
++                },
+                 type: themeState.mode,
+             },
+             sidebar: {

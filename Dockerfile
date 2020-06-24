@@ -20,8 +20,8 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -
     apt-get autoclean -y --no-install-recommends
 
 ## Get and Make CMake version 3.18.0 (latest when Dockerfile developed) - Adjust as necessary
-RUN cd /home/ && wget --no-check-certificate https://cmake.org/files/v3.18/cmake-3.18.0-rc1.tar.gz && \
-    tar xvf cmake-3.18.0-rc1.tar.gz && rm cmake-3.18.0-rc1.tar.gz && cd /home/cmake-3.18.0-rc1 && \
+RUN cd /home/ && wget --no-check-certificate https://cmake.org/files/v3.18/cmake-3.18.0-rc2.tar.gz && \
+    tar xvf cmake-3.18.0-rc2.tar.gz && rm cmake-3.18.0-rc2.tar.gz && cd /home/cmake-3.18.0-rc2 && \
     ./bootstrap && \
     if [ -n "$makemt" ]; then echo "Making multi-threaded with $makemt jobs"; make -j$makemt; else echo "Making single-threaded"; make; fi && \
     make install
@@ -84,7 +84,7 @@ RUN cd /home/ && git config --global http.sslVerify false && \
     git clone https://github.com/sony/nmos-js.git
 
 ## Custom branding
-COPY mellanox-logo-horizontal-blue.png nmos-js.patch /home/nmos-js/Development/src/assets/
+COPY NVIDIA_Logo_H_ForScreen_ForLightBG.png nmos-js.patch /home/nmos-js/Development/src/assets/
 RUN cd /home && \
     mv /home/nmos-js/Development/src/assets/nmos-js.patch /home && \
     patch -p0 <nmos-js.patch && \
@@ -100,7 +100,7 @@ RUN cd /home/nmos-js/Development && \
 ## Move executables, libraries and clean up container as much as possible
 RUN cd /home/nmos-cpp/Development/build && \
     cp nmos-cpp-node nmos-cpp-registry /home && \
-    cd /home && rm -rf .git conan cmake-3.18.0-rc1 nmos-cpp nmos-js nmos-web-router
+    cd /home && rm -rf .git conan cmake-3.18.0-rc2 nmos-cpp nmos-js nmos-web-router
 
 ## Re-build container for optimised runtime environment using clean Ubuntu Bionic release
 FROM ubuntu:bionic
