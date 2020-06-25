@@ -19,9 +19,9 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -
     apt-get clean -y --no-install-recommends && \
     apt-get autoclean -y --no-install-recommends
 
-## Get and Make CMake version 3.18.0 (latest when Dockerfile developed) - Adjust as necessary
-RUN cd /home/ && wget --no-check-certificate https://cmake.org/files/v3.18/cmake-3.18.0-rc2.tar.gz && \
-    tar xvf cmake-3.18.0-rc2.tar.gz && rm cmake-3.18.0-rc2.tar.gz && cd /home/cmake-3.18.0-rc2 && \
+## Get and Make CMake version 3.17.3 (latest GA when Dockerfile developed) - Adjust as necessary
+RUN cd /home/ && wget --no-check-certificate https://cmake.org/files/v3.17/cmake-3.17.3.tar.gz && \
+    tar xvf cmake-3.17.3.tar.gz && rm cmake-3.17.3.tar.gz && cd /home/cmake-3.17.3 && \
     ./bootstrap && \
     if [ -n "$makemt" ]; then echo "Making multi-threaded with $makemt jobs"; make -j$makemt; else echo "Making single-threaded"; make; fi && \
     make install
@@ -100,7 +100,7 @@ RUN cd /home/nmos-js/Development && \
 ## Move executables, libraries and clean up container as much as possible
 RUN cd /home/nmos-cpp/Development/build && \
     cp nmos-cpp-node nmos-cpp-registry /home && \
-    cd /home && rm -rf .git conan cmake-3.18.0-rc2 nmos-cpp nmos-js nmos-web-router
+    cd /home && rm -rf .git conan cmake-3.17.3 nmos-cpp nmos-js nmos-web-router
 
 ## Re-build container for optimised runtime environment using clean Ubuntu Bionic release
 FROM ubuntu:bionic
