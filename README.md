@@ -18,7 +18,7 @@ Specifically the implementation supports the following specifications:
 - AMWA IS-04 NMOS Discovery and Registration Specification (supporting v1.0-v1.3)
 - AMWA IS-05 NMOS Connection Management Specification (supporting v1.0-v1.1)
 - AMWA IS-07 NMOS Event & Tally Specification (supporting v1.1)
-- AMWA IS-09 NMOS System Specification (originally defined in JT-NM TR-1001-1:2018 Annex A) (supporting v1.0-Dev)
+- AMWA IS-09 NMOS System Specification (originally defined in JT-NM TR-1001-1:2018 Annex A) (supporting v1.0)
 - AMWA BCP-002-01 NMOS Grouping Recommendations - Natural Grouping
 - AMWA BCP-003-01 NMOS API Security Recommendations - Securing Communications
 
@@ -36,7 +36,7 @@ The nmos-cpp container includes implementations of the NMOS Node, Registration a
 
 [<img alt="JT-NM Tested 03/20 NMOS & TR-1001-1 Controller" src="https://github.com/rhastie/build-nmos-cpp/blob/master/images/jt-nm-org_tested_NMOS-TR-CONTROLLERS_03-20_badge.png?raw=true" height="120" align="right"/>](https://jt-nm.org/jt-nm_tested/)[<img alt="JT-NM Tested 03/20 NMOS & TR-1001-1" src="https://github.com/rhastie/build-nmos-cpp/blob/master/images/jt-nm-org_self-tested_NMOS-TR_03-20_badge.png?raw=true" height="120" align="right"/>](https://jt-nm.org/jt-nm_tested/)
 
-The Mellanox NMOS docker container has now passed the stringent testing required by JT-NM for both Registries and Controllers. The container was tested whilst running on a Mellanox Spectrum/Spectrum-2 switch using the Onyx Docker subsystem. You can access the [JT-NM testing matrix here](https://www.jt-nm.org/documents/JT-NM_Tested_Catalog_NMOS-TR-1001_Full-Online-2020-05-12.pdf).
+The NVIDIA NMOS docker container has now passed the stringent testing required by JT-NM for both Registries and Controllers. The container was tested whilst running on a Mellanox Spectrum/Spectrum-2 switch using the Onyx Docker subsystem. You can access the [JT-NM testing matrix here](https://www.jt-nm.org/documents/JT-NM_Tested_Catalog_NMOS-TR-1001_Full-Online-2020-05-12.pdf).
 
 In addition, the container has been successfully tested in AMWA Networked Media Incubator workshops.
 
@@ -54,11 +54,11 @@ The container has been tested on the following platforms for compatibility:
 - Mellanox Bluefield family of SmartNICs (operating natively on the SmartNIC ARM cores)
 - NVIDIA Jetson AGX Xavier Developer Kit (even though not tested the container should function on all NVIDIA AGX platforms)
 - Raspberry Pi RPi 3 Model B and RPi 4 Model B (both Raspbian's standard 32-bit and the new experimental 64-bit kernels have been tested)
-- Standard Intel and AMD Servers running the container under Ubuntu Linux - Both bare-metal and virtualised environments have been tested. 
+- Standard Intel and AMD Servers running the container under Ubuntu Linux and Windows - Both bare-metal and virtualised environments have been tested. 
 
 ### Continuous Integration (CI) Testing
 
-The Mellanox NMOS container, like the NMOS Specifications, is intended to be always ready, but continually developing.
+The NVIDIA NMOS container, like the NMOS Specifications, is intended to be always ready, but continually developing.
 To ease development overheads and to continually validate the status of the container it now undergoes CI Testing via GitHub Actions.
 This CI testing is meant as a sanity check around the container functionality rather than extensive testing of nmos-cpp functionality itself.
 Please see wider [Sony CI Testing](https://github.com/sony/nmos-cpp/blob/master/README.md#build-status) for deeper testing on nmos-cpp.
