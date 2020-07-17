@@ -15,17 +15,18 @@ The resulting Docker Container is specifically optimised to operate on a Mellano
 
 Specifically the implementation supports the following specifications:
 
-- AMWA IS-04 NMOS Discovery and Registration Specification (supporting v1.0-v1.3)
-- AMWA IS-05 NMOS Connection Management Specification (supporting v1.0-v1.1)
-- AMWA IS-07 NMOS Event & Tally Specification (supporting v1.1)
-- AMWA IS-09 NMOS System Specification (originally defined in JT-NM TR-1001-1:2018 Annex A) (supporting v1.0)
-- AMWA BCP-002-01 NMOS Grouping Recommendations - Natural Grouping
-- AMWA BCP-003-01 NMOS API Security Recommendations - Securing Communications
+- [AMWA IS-04 NMOS Discovery and Registration Specification](https://amwa-tv.github.io/nmos-discovery-registration) (supporting v1.0-v1.3)
+- [AMWA IS-05 NMOS Connection Management Specification](https://amwa-tv.github.io/nmos-device-connection-management) (supporting v1.0-v1.1)
+- [AMWA IS-07 NMOS Event & Tally Specification](https://amwa-tv.github.io/nmos-event-tally) (supporting v1.1)
+- [AMWA IS-08 NMOS Audio Channel Mapping Specification](https://amwa-tv.github.io/nmos-audio-channel-mapping) (supporting v1.0)
+- [AMWA IS-09 NMOS System Specification](https://amwa-tv.github.io/nmos-system) (originally defined in JT-NM TR-1001-1:2018 Annex A) (supporting v1.0)
+- [AMWA BCP-002-01 NMOS Grouping Recommendations](https://amwa-tv.github.io/nmos-grouping) - Natural Grouping
+- [AMWA BCP-003-01 NMOS API Security Recommendations](https://amwa-tv.github.io/nmos-api-security) - Securing Communications
 
 Additionally it supports the following additional components:
 
 - Supports auto identification of the switch Boundary Clock PTP Domain which is published via the AMWA IS-09 System Resource when run on a Mellanox switch
-- Supports an embedded NMOS Browser Client/Controller which support NMOS Control using AMWA IS-05
+- Supports an embedded NMOS Browser Client/Controller which supports NMOS Control using AMWA IS-05. This implementation does not currently support AMWA IS-08
 - Supports a DNS-SD Bridge to HTML implementation that supports both mDNS and DNS-SD
 
 The nmos-cpp container includes implementations of the NMOS Node, Registration and Query APIs, and the NMOS Connection API. It also included a NMOS Browser Client/Controller in JavaScript and a DNS-SD API which aren't part of the specifications.
@@ -80,6 +81,8 @@ The [AMWA NMOS API Testing Tool](https://github.com/AMWA-TV/nmos-testing) is aut
 [![IS-05-02][IS-05-02-badge]][IS-05-02-sheet]
 [![IS-07-01][IS-07-01-badge]][IS-07-01-sheet]
 [![IS-07-02][IS-07-02-badge]][IS-07-02-sheet]
+[![IS-08-01][IS-08-01-badge]][IS-08-01-sheet]
+[![IS-08-02][IS-08-02-badge]][IS-08-02-sheet]
 [![IS-09-01][IS-09-01-badge]][IS-09-01-sheet]
 [![IS-09-02][IS-09-02-badge]][IS-09-02-sheet]
 
@@ -90,6 +93,8 @@ The [AMWA NMOS API Testing Tool](https://github.com/AMWA-TV/nmos-testing) is aut
 [IS-05-02-badge]: https://github.com/rhastie/build-nmos-cpp/blob/badges/IS-05-02.svg?raw=true
 [IS-07-01-badge]: https://github.com/rhastie/build-nmos-cpp/blob/badges/IS-07-01.svg?raw=true
 [IS-07-02-badge]: https://github.com/rhastie/build-nmos-cpp/blob/badges/IS-07-02.svg?raw=true
+[IS-08-01-badge]: https://github.com/rhastie/build-nmos-cpp/blob/badges/IS-08-01.svg?raw=true
+[IS-08-02-badge]: https://github.com/rhastie/build-nmos-cpp/blob/badges/IS-08-02.svg?raw=true
 [IS-09-01-badge]: https://github.com/rhastie/build-nmos-cpp/blob/badges/IS-09-01.svg?raw=true
 [IS-09-02-badge]: https://github.com/rhastie/build-nmos-cpp/blob/badges/IS-09-02.svg?raw=true
 [IS-04-01-sheet]: https://docs.google.com/spreadsheets/d/1xtxALyCpr5cR4zHwjnW12b8wAOf2uvL0QBLFCPgdE1A/edit#gid=0
@@ -99,6 +104,8 @@ The [AMWA NMOS API Testing Tool](https://github.com/AMWA-TV/nmos-testing) is aut
 [IS-05-02-sheet]: https://docs.google.com/spreadsheets/d/1xtxALyCpr5cR4zHwjnW12b8wAOf2uvL0QBLFCPgdE1A/edit#gid=205041321
 [IS-07-01-sheet]: https://docs.google.com/spreadsheets/d/1xtxALyCpr5cR4zHwjnW12b8wAOf2uvL0QBLFCPgdE1A/edit#gid=828991990
 [IS-07-02-sheet]: https://docs.google.com/spreadsheets/d/1xtxALyCpr5cR4zHwjnW12b8wAOf2uvL0QBLFCPgdE1A/edit#gid=367400040
+[IS-08-01-sheet]: https://docs.google.com/spreadsheets/d/1xtxALyCpr5cR4zHwjnW12b8wAOf2uvL0QBLFCPgdE1A/edit#gid=2053447021
+[IS-08-02-sheet]: https://docs.google.com/spreadsheets/d/1xtxALyCpr5cR4zHwjnW12b8wAOf2uvL0QBLFCPgdE1A/edit#gid=1817945171
 [IS-09-01-sheet]: https://docs.google.com/spreadsheets/d/1xtxALyCpr5cR4zHwjnW12b8wAOf2uvL0QBLFCPgdE1A/edit#gid=919453974
 [IS-09-02-sheet]: https://docs.google.com/spreadsheets/d/1xtxALyCpr5cR4zHwjnW12b8wAOf2uvL0QBLFCPgdE1A/edit#gid=2135469955
 
