@@ -14,3 +14,9 @@ update_label=TRUE
 update_ptp_domain=TRUE
 switch_username=admin
 switch_password=admin
+
+#Run MQTT Broker from container. Advertisement is using mDNS only. For DNS-SD use external DNS
+run_mqtt=TRUE
+mqtt_port=1883
+advertise_mqtt=TRUE
+

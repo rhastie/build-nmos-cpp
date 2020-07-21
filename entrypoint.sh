@@ -133,7 +133,7 @@ echo -e "\nStarting mDNSResponder service"
 #/etc/init.d/dbus start
 #/etc/init.d/avahi-daemon start
 
-# Start Sony Registry or Node Application inside correct directory with logging on or off
+# Start Sony Registry, Sony Node and/or MQTT Broker inside correct directory with logging on or off
 sleep 1
 
 if [ -v RUN_NODE ] && [ "$RUN_NODE" = "TRUE" ]; then
@@ -144,7 +144,7 @@ if [ -v RUN_NODE ] && [ "$RUN_NODE" = "TRUE" ]; then
     cat $node_json
     if cfg_haskey log_output && [ "$(cfg_read log_output)" = "TRUE" ]; then
         echo -e "\nStarting with file logging"
-        /home/nmos-cpp-node $node_json >>/home/logreg-err.txt 2>/home/logreg-out.txt
+        /home/nmos-cpp-node $node_json >>/home/lognode-err.txt 2>/home/lognode-out.txt
     else
         echo -e "\nStarting with output to console"
         /home/nmos-cpp-node $node_json
@@ -152,6 +152,29 @@ if [ -v RUN_NODE ] && [ "$RUN_NODE" = "TRUE" ]; then
     ret=$?
 
 else
+
+    # Start Mosquitto MQTT Broker service
+    if cfg_haskey mqtt_port; then
+        mqtt_port=$(cfg_read mqtt_port)
+        echo -e "\nSetting MQTT Broker port to $mqtt_port"
+        echo -e "\n#Automatically added by entrypoint.sh script on execution\nlistener $mqtt_port\n" >> /etc/mosquitto/mosquitto.conf
+    else
+        echo -e "\nUsing default MQTT Broker port of 1883"
+    fi
+
+    if cfg_haskey run_mqtt && [ "$(cfg_read run_mqtt)" = "TRUE" ]; then
+        echo -e "\nStarting MQTT Broker Service"
+        /etc/init.d/mosquitto start
+        if cfg_haskey advertise_mqtt && [ "$(cfg_read advertise_mqtt)" = "TRUE" ]; then
+            mqtt_instance="nmos-cpp_mqtt_$(hostname -I | cut -d ' ' -f1):$mqtt_port"
+            echo -e "\nAdvertising MQTT Broker using mDNS instance: $mqtt_instance"
+            dns-sd -R $mqtt_instance _nmos-mqtt._tcp local $mqtt_port api_proto=mqtt api_auth=false &
+        else
+            echo -e "\nNot advertising MQTT Broker"
+        fi
+    else
+        echo -e "\nNot starting MQTT Broker Service"
+    fi
 
     # Start Sony Registry Application
 

@@ -5,7 +5,7 @@ LABEL maintainer="richh@mellanox.com"
 ARG makemt
 
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn \
-    NMOS_CPP_VERSION=709e403502959c03b0a8df4d69658316eeea709f
+    NMOS_CPP_VERSION=b0dcf9dc0459c4c6b43be8dfb2f77183bfc4a4a3
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -y --no-install-recommends \
     g++ build-essential \
@@ -112,7 +112,7 @@ COPY --from=stage1-build /home /home
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -y --no-install-recommends \
     openssl make \
 # Avahi:    dbus avahi-daemon libavahi-compat-libdnssd-dev libnss-mdns AND NOT make \
-    nano curl jq && \
+    mosquitto nano curl jq && \
     cd /home/mDNSResponder-878.260.1/mDNSPosix && make os=linux install && \
     cd /home && rm -rf /home/mDNSResponder-878.260.1 /etc/nsswitch.conf.pre-mdns && \
     apt-get purge -y make && \
