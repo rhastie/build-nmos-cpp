@@ -81,10 +81,10 @@ jobs:
         shell: bash
         run: docker images
 
-      - name: Ubuntu avahi setup
+      - name: Ubuntu avahi and mosquitto-clients setup
         run: |
           sudo apt-get update
-          sudo apt-get install -f libavahi-compat-libdnssd-dev
+          sudo apt-get install -f libavahi-compat-libdnssd-dev mosquitto-clients
           # make avahi only respond on the "eth0" interface
           sudo sed -i 's/#*allow-interfaces=.*/allow-interfaces=eth0/g' /etc/avahi/avahi-daemon.conf
           sudo systemctl restart avahi-daemon
@@ -222,6 +222,48 @@ jobs:
           do_run_test IS-09-01 --host "${{ env.HOST_IP_ADDRESS }}" --port 8010 --version v1.0
  
           echo ${{ env.TEST_FAIL }}
+
+          exit 0
+
+      - name: Test MQTT Broker for basic connectivity and function
+        shell: bash
+        working-directory: ${{ env.RUNNER_WORKSPACE }}
+        run:
+          |
+          set -x
+
+          mqtt_error=FALSE
+
+          cd nmos-testing
+
+          # Start a subscriber, connect to MQTT Broker and listen on topic
+          mosquitto_sub -h "${{ env.HOST_IP_ADDRESS }}" -p 1883 -t test -C 1 > ./mqtt_pub_output &
+          if [ $? -ne 0 ]; then
+              mqtt_error=TRUE
+          fi
+
+          sleep 1
+
+          # Start a publisher, connect to MQTT Broker and post a message
+          mosquitto_pub -h "${{ env.HOST_IP_ADDRESS }}" -p 1883 -t test -m "Ping MQTT test"
+          if [ $? -ne 0 ]; then
+              mqtt_error=TRUE
+          fi
+
+          # Short delay to allow connections, transfer of message and closure of subscriber
+          sleep 1
+
+          sub_output=$(cat ./mqtt_pub_output)
+          rm ./mqtt_pub_output
+
+          #Check if we got the expected message from the subscriber
+          if [ "$sub_output" == 'Ping MQTT test' ] && [ "$mqtt_error" == 'FALSE' ]; then
+              echo "Passed MQTT Broker Test"
+              echo "Pass" > badges/MQTT-Broker.txt
+          else
+              echo "Failed MQTT Broker Test"
+              echo "Fail" > badges/MQTT-Broker.txt
+          fi
 
           exit 0
 
