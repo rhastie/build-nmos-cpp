@@ -27,9 +27,10 @@ Additionally it supports the following additional components:
 
 - Supports auto identification of the switch Boundary Clock PTP Domain which is published via the AMWA IS-09 System Resource when run on a Mellanox switch
 - Supports an embedded NMOS Browser Client/Controller which supports NMOS Control using AMWA IS-05. This implementation does not currently support AMWA IS-08
+- Supports an embedded MQTT Broker (mosquitto) to allow simplified use of the NMOS MQTT Transport type for AMWA IS-05 and IS-07 
 - Supports a DNS-SD Bridge to HTML implementation that supports both mDNS and DNS-SD
 
-The nmos-cpp container includes implementations of the NMOS Node, Registration and Query APIs, and the NMOS Connection API. It also included a NMOS Browser Client/Controller in JavaScript and a DNS-SD API which aren't part of the specifications.
+The nmos-cpp container includes implementations of the NMOS Node, Registration and Query APIs, and the NMOS Connection API. It also included a NMOS Browser Client/Controller in JavaScript, a MQTT Broker and a DNS-SD API which aren't part of the specifications.
 
 ## Container Testing and supported architectures
 
@@ -85,6 +86,7 @@ The [AMWA NMOS API Testing Tool](https://github.com/AMWA-TV/nmos-testing) is aut
 [![IS-08-02][IS-08-02-badge]][IS-08-02-sheet]
 [![IS-09-01][IS-09-01-badge]][IS-09-01-sheet]
 [![IS-09-02][IS-09-02-badge]][IS-09-02-sheet]
+[![MQTT-Broker][MQTT-Broker-badge]][MQTT-Broker-link]
 
 [IS-04-01-badge]: https://github.com/rhastie/build-nmos-cpp/blob/badges/IS-04-01.svg?raw=true
 [IS-04-02-badge]: https://github.com/rhastie/build-nmos-cpp/blob/badges/IS-04-02.svg?raw=true
@@ -97,6 +99,7 @@ The [AMWA NMOS API Testing Tool](https://github.com/AMWA-TV/nmos-testing) is aut
 [IS-08-02-badge]: https://github.com/rhastie/build-nmos-cpp/blob/badges/IS-08-02.svg?raw=true
 [IS-09-01-badge]: https://github.com/rhastie/build-nmos-cpp/blob/badges/IS-09-01.svg?raw=true
 [IS-09-02-badge]: https://github.com/rhastie/build-nmos-cpp/blob/badges/IS-09-02.svg?raw=true
+[MQTT-Broker-badge]: https://github.com/rhastie/build-nmos-cpp/blob/badges/MQTT-Broker.svg?raw=true
 [IS-04-01-sheet]: https://docs.google.com/spreadsheets/d/1xtxALyCpr5cR4zHwjnW12b8wAOf2uvL0QBLFCPgdE1A/edit#gid=0
 [IS-04-02-sheet]: https://docs.google.com/spreadsheets/d/1xtxALyCpr5cR4zHwjnW12b8wAOf2uvL0QBLFCPgdE1A/edit#gid=1838684224
 [IS-04-03-sheet]: https://docs.google.com/spreadsheets/d/1xtxALyCpr5cR4zHwjnW12b8wAOf2uvL0QBLFCPgdE1A/edit#gid=1174955447
@@ -108,6 +111,7 @@ The [AMWA NMOS API Testing Tool](https://github.com/AMWA-TV/nmos-testing) is aut
 [IS-08-02-sheet]: https://docs.google.com/spreadsheets/d/1xtxALyCpr5cR4zHwjnW12b8wAOf2uvL0QBLFCPgdE1A/edit#gid=1817945171
 [IS-09-01-sheet]: https://docs.google.com/spreadsheets/d/1xtxALyCpr5cR4zHwjnW12b8wAOf2uvL0QBLFCPgdE1A/edit#gid=919453974
 [IS-09-02-sheet]: https://docs.google.com/spreadsheets/d/1xtxALyCpr5cR4zHwjnW12b8wAOf2uvL0QBLFCPgdE1A/edit#gid=2135469955
+[MQTT-Broker-link]: https://mosquitto.org/man/mosquitto-8.html
 
 ## How to install and run the container NMOS Registry/Controller
 
