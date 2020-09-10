@@ -62,22 +62,18 @@ config_file="/home/container-config"
 do_params
 
 # Adjust registry.json and node.json to update/add "label" with relevant "$(hostname)" data
-
 echo -e "\nChecking for update_label parameter"
 if cfg_haskey update_label && [ "$(cfg_read update_label)" = "TRUE" ]; then
 
     # Update label field in registry.json
-
     echo -e "Insert/Replace label: with $(hostname) hostname in $registry_json file"
-    jq --arg key "$(hostname)-registry" '. + {label: $key}' "$registry_json" > /home/registry.json.tmp
-
-    mv /home/registry.json.tmp $registry_json
+    jq --arg key "$(hostname)-registry" '. + {label: $key}' "$registry_json" > /home/registry.json.tmp \
+        && mv /home/registry.json.tmp $registry_json
 
     # Update label field in node.json
-
     echo -e "Insert/Replace label: with $(hostname) hostname in $node_json file"
-    jq --arg key "$(hostname)-node" '. + {label: $key}' "$node_json" > /home/node.json.tmp
-    mv /home/node.json.tmp $node_json
+    jq --arg key "$(hostname)-node" '. + {label: $key}' "$node_json" > /home/node.json.tmp \
+        && mv /home/node.json.tmp $node_json
 fi
 
 # Adjust registry.json to update/add "ptp_domain_number" with relevant PTP Domain data if on a Mellanox switch
@@ -107,8 +103,8 @@ if cfg_haskey update_ptp_domain && [ "$(cfg_read update_ptp_domain)" = "TRUE" ];
             echo -e "BC PTP Domain on Mellanox Switch is set to: $ptp_domain"
 
             echo -e "Insert/Replace ptp_domain_number: with $ptp_domain in $registry_json file"
-            jq --argjson key "$ptp_domain" '. + {ptp_domain_number: $key}' "$registry_json" > /home/registry.json.tmp
-            mv /home/registry.json.tmp $registry_json
+            jq --argjson key "$ptp_domain" '. + {ptp_domain_number: $key}' "$registry_json" > /home/registry.json.tmp \
+                && mv /home/registry.json.tmp $registry_json
 
         else
             # We got an ERROR from the Switch report why we had error
