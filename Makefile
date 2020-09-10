@@ -26,7 +26,7 @@ run: build
 	docker run -d -it --net=host --name $(NAME)-registry --rm $(NAME):$(VERSION)
 
 runnode: buildnode
-	docker run -d -it --net=host --name $(NAME)-node --rm $(NAME)-node:$(VERSION)
+	docker run -d -it --net=host -e RUN_NODE=TRUE --name $(NAME)-node --rm $(NAME)-node:$(VERSION)
 
 start: run
 	docker attach $(NAME)-registry
