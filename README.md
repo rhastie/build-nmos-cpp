@@ -174,7 +174,9 @@ Prerequisites:
 - Install a full Docker CE environment using [instructions](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
 - Set [docker permission](https://superuser.com/questions/835696/how-solve-permission-problems-for-docker-in-ubuntu#853682) for your host user
 
-Execute the follow Linux commands to download and run the container on the host:
+## Run
+
+Execute the following Linux commands to download the NMOS registry image and run a container on the host:
 
 ```sh
 docker pull rhastie/nmos-cpp:latest
@@ -192,26 +194,25 @@ The running container listens on port 8010 for all available IP addresses used b
 
 ## Running the NMOS Virtual Node implementation
 
-The container also contains an implementation of NMOS Virtual Node. This can simulate a node attaching to the registry/controller. Importantly, a single instance of the container can run the registry/controller or the node, but not both at the same time. If you need both operating, you just start a second instance of the container.
+The image also contains Sony's implementation of NMOS Virtual Node. This can simulate a node attaching to the registry/controller. Importantly, a container can run the registry/controller or the node, but not both at the same time. If you need both operating, you just start a second container.
 
-By design the container is configured not to run the node implementation by default, however, you can override this default using two different approaches:
+By design the image is configured not to run the node implementation by default, however, you can override this default using two different approaches:
 
 ### Using an environment variable
 
-There is a docker environmental variable available that will override the default execution of the container and start the NMOS Virtual node. Use the following command to start the container using this variable:
+There is a Docker environment variable available that will override the default execution of the container and start the NMOS Virtual node. Use the following command to start the container using this variable:
 
 ```sh
 docker run -it --net=host --name nmos-registry --rm -e "RUN_NODE=TRUE" rhastie/nmos-cpp:latest
 ```
 
-### Building the container and altering the default execution
+### Building the image and altering the default execution
 
-You can use the process below to build the container so that the default execution is changed and the container executes the NMOS Virtual Node at runtime without needing an environmental variable being set
-
+You can use the process below to build the image so that the default execution is changed and the container executes the NMOS Virtual Node at runtime without needing an environmental variable being set
 
 ## How to build the container
 
-Below are some brief instructions on how to build the container. There are several additional commands available and its suggested you review the Makefile in the repository
+Below are some brief instructions on how to build the image. There are several additional commands available and its suggested you review the [Makefile](./Makefile).
 
 ### Building the default container for NMOS Registry/Controller execution
 
