@@ -4,9 +4,9 @@
 
 ## Implementation Overview
 
-This repository contains all the files needed to create a Dockerised container implementation of the AMWA Networked Media Open Specifications. For more information about AMWA, NMOS and the Networked Media Incubator, please refer to http://amwa.tv/.
+This repository contains all the files needed to create a Dockerised implementation of the AMWA Networked Media Open Specifications. For more information about AMWA, NMOS and the Networked Media Incubator, please refer to http://amwa.tv/.
 
-This work is principally based on the open-sourced implementation from Sony. Please see: http://github.com/sony/nmos-cpp
+This work is principally based on the [open-sourced implementation from Sony](http://github.com/sony/nmos-cpp).
 
 The resulting Docker Container is specifically optimised to operate on a Mellanox switch, but can also function independently on many other platforms. Please see overview presentation from the IP Showcase @ IBC 2019:
 
@@ -25,12 +25,10 @@ Specifically the implementation supports the following specifications:
 
 Additionally it supports the following additional components:
 
-- Supports auto identification of the switch Boundary Clock PTP Domain which is published via the AMWA IS-09 System Resource when run on a Mellanox switch
-- Supports an embedded NMOS Browser Client/Controller which supports NMOS Control using AMWA IS-05. This implementation does not currently support AMWA IS-08
-- Supports an embedded MQTT Broker (mosquitto) to allow simplified use of the NMOS MQTT Transport type for AMWA IS-05 and IS-07 
-- Supports a DNS-SD Bridge to HTML implementation that supports both mDNS and DNS-SD
-
-The nmos-cpp container includes implementations of the NMOS Node, Registration and Query APIs, and the NMOS Connection API. It also included a NMOS Browser Client/Controller in JavaScript, a MQTT Broker and a DNS-SD API which aren't part of the specifications.
+- auto identification of the switch Boundary Clock PTP Domain which is published via the AMWA IS-09 System Resource when run on a Mellanox switch
+- embedded visual NMOS Browser Client/Controller which supports NMOS Control using AMWA IS-05. This implementation does not currently support AMWA IS-08
+- embedded MQTT Broker (mosquitto) to allow simplified use of the NMOS MQTT Transport type for AMWA IS-05 and IS-07
+- DNS-SD Bridge to HTML implementation that supports both mDNS and DNS-SD
 
 ## Container Testing and supported architectures
 
@@ -38,17 +36,17 @@ The nmos-cpp container includes implementations of the NMOS Node, Registration a
 
 [<img alt="JT-NM Tested 03/20 NMOS & TR-1001-1 Controller" src="https://github.com/rhastie/build-nmos-cpp/blob/master/images/jt-nm-org_tested_NMOS-TR-CONTROLLERS_03-20_badge.png?raw=true" height="120" align="right"/>](https://jt-nm.org/jt-nm_tested/)[<img alt="JT-NM Tested 03/20 NMOS & TR-1001-1" src="https://github.com/rhastie/build-nmos-cpp/blob/master/images/jt-nm-org_self-tested_NMOS-TR_03-20_badge.png?raw=true" height="120" align="right"/>](https://jt-nm.org/jt-nm_tested/)
 
-The NVIDIA NMOS docker container has now passed the stringent testing required by JT-NM for both Registries and Controllers. The container was tested whilst running on a Mellanox Spectrum/Spectrum-2 switch using the Onyx Docker subsystem. You can access the [JT-NM testing matrix here](https://www.jt-nm.org/documents/JT-NM_Tested_Catalog_NMOS-TR-1001_Full-Online-2020-05-12.pdf).
+The NVIDIA NMOS Docker container has now passed the stringent testing required by JT-NM for both Registries and Controllers. The container was tested whilst running on a Mellanox Spectrum/Spectrum-2 switch using the Onyx Docker subsystem. You can access the [JT-NM testing matrix here](https://www.jt-nm.org/documents/JT-NM_Tested_Catalog_NMOS-TR-1001_Full-Online-2020-05-12.pdf).
 
 In addition, the container has been successfully tested in AMWA Networked Media Incubator workshops.
 
 ### Tested Platforms and supported CPU Architectures
 
-The Dockerfile in this repository is designed so that if needed it can be run under the Docker Experimental BuildX CLI feature set. The container is published for the follow CPU Architectures:
+The Docker image defined by the [Dockerfile](./Dockerfile) can be run, if needed, under the Docker Experimental BuildX CLI feature set. It is published for the following CPU Architectures:
 
-- Intel and AMD x86_86 64-bit architectures
-- ARMv8 AArch64 (64-bit ARM architecture)
-- ARMv7 AArch32 (32-bit ARM architecture)
+- Intel and AMD x86_64
+- ARMv8 AArch64
+- ARMv7 AArch32
 
 The container has been tested on the following platforms for compatibility:
 
@@ -56,7 +54,7 @@ The container has been tested on the following platforms for compatibility:
 - Mellanox Bluefield family of SmartNICs (operating natively on the SmartNIC ARM cores)
 - NVIDIA Jetson AGX Xavier Developer Kit (even though not tested the container should function on all NVIDIA AGX platforms)
 - Raspberry Pi RPi 3 Model B and RPi 4 Model B (both Raspbian's standard 32-bit and the new experimental 64-bit kernels have been tested)
-- Standard Intel and AMD Servers running the container under Ubuntu Linux and Windows - Both bare-metal and virtualised environments have been tested. 
+- Standard Intel and AMD Servers running the container under Ubuntu Linux and Windows - Both bare-metal and virtualised environments have been tested.
 
 ### Continuous Integration (CI) Testing
 
@@ -65,7 +63,7 @@ To ease development overheads and to continually validate the status of the cont
 This CI testing is meant as a sanity check around the container functionality rather than extensive testing of nmos-cpp functionality itself.
 Please see wider [Sony CI Testing](https://github.com/sony/nmos-cpp/blob/master/README.md#build-status) for deeper testing on nmos-cpp.
 
-The following configuration, defined by the [ci-build-test-publish](.github/workflows/ci-build-test-publish.yml) job, is built and unit tested automatically via continuous integration. If the tests complete successfully the container is published directly to Docker Hub and also saved as an artifact against the GitHub Action Job. Additional configurations may be added in the future.
+The following configuration, defined by the [ci-build-test-publish](.github/workflows/ci-build-test-publish.yml) job, is built and unit tested automatically via continuous integration. If the tests complete successfully, the image is published directly to [Docker Hub](https://hub.docker.com/r/rhastie/nmos-cpp) and also saved as an artifact against the GitHub Action Job. Additional configurations may be added in the future.
 
 | Platform | Version                  | Configuration Options                  |
 |----------|--------------------------|----------------------------------------|
@@ -129,7 +127,7 @@ Execute the following switch commands to download and run the container on the s
 - "docker" - Enables the Docker subsystem on the switch (Make sure you exit the docker menu tree using "exit")
 - "docker no shutdown" - Activates Docker on the switch
 - "docker pull rhastie/nmos-cpp:latest" - Pulls the latest version of the Docker container from Docker Hub
-- "docker start rhastie/nmos-cpp latest nmos now privileged network" - Start Docker container immediately
+- "docker start rhastie/nmos-cpp latest nmos now privileged network" - Starts Docker container immediately
 - "docker no start nmos" - Stops the Docker container
 
 Additional/optional steps:
@@ -202,16 +200,16 @@ Execute the follow Linux commands to download and run the container on the host:
 ```sh
 docker pull rhastie/nmos-cpp:latest
 docker run -it --net=host --privileged --rm rhastie/nmos-cpp:latest
+docker ps
 ```
 
 ## Accessing the NMOS Web GUI Interface
 
-The container publishes on all available IP addresses using port 8010
+The running container listens on port 8010 for all available IP addresses used by the host.
 
-- Browse to http://[Switch or Host IP Address>]:8010 to get to the Web GUI interface.
-- The NMOS Registry is published on the "x-nmos" URL
-- The NMOS Browser Client/Controller is published on the "admin" URL
-
+- Browse to `http://[Switch or Host IP Address>]:8010` to get to the Web GUI
+- The NMOS Registry is published on the `/x-nmos` path
+- The NMOS Browser Client/Controller is published on the `/admin` path
 
 ## Running the NMOS Virtual Node implementation
 
@@ -255,4 +253,12 @@ make build
 ```sh
 make buildnode
 ```
-Please note the container will be built with a “-node” suffix applied to remove any confusion.
+
+Please note the image will be built with a “-node” suffix applied to remove any confusion with the registry. Start the container:
+
+```sh
+docker images
+docker run -it --net=host --name nmos-node --rm nmos-cpp-node
+```
+
+If everything goes well, you should should see the Virtual Node displayed in the web interface of the registry.
