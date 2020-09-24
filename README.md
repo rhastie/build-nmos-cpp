@@ -147,13 +147,6 @@ Prerequisites:
 - Docker is generally provided under the Mellanox BFB image, but if not available, install a full Docker CE environment using [instructions](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
 - Set [docker permission](https://superuser.com/questions/835696/how-solve-permission-problems-for-docker-in-ubuntu#853682) for your host user
 
-Execute the follow Linux commands to download and run the container on the host:
-
-```sh
-docker pull rhastie/nmos-cpp:latest
-docker run -it --net=host --privileged --rm rhastie/nmos-cpp:latest
-```
-
 ### On a NVIDIA Jetson AGX Developer Kit
 
 Prerequisites:
@@ -163,13 +156,6 @@ Prerequisites:
 - Docker is generally provided under the NVIDIA JetPack image, but if not available, install a full Docker CE environment using [instructions](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
 - Set [docker permission](https://superuser.com/questions/835696/how-solve-permission-problems-for-docker-in-ubuntu#853682) for your host user
 
-Execute the follow Linux commands to download and run the container on the host:
-
-```sh
-docker pull rhastie/nmos-cpp:latest
-docker run -it --net=host --privileged --rm rhastie/nmos-cpp:latest
-```
-
 ### Raspberry Pi RPi 3 Model B and RPi 4 Model B
 
 Prerequisites:
@@ -178,13 +164,6 @@ Prerequisites:
 - Have an accurate date and time
 - If using Raspbian Buster you can installed Docker using "sudo apt-get install docker.io". If using older versions of Raspbian install a full Docker CE environment using [instructions](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
 - Set [docker permission](https://superuser.com/questions/835696/how-solve-permission-problems-for-docker-in-ubuntu#853682) for your host user
-
-Execute the follow Linux commands to download and run the container on the host:
-
-```sh
-docker pull rhastie/nmos-cpp:latest
-docker run -it --net=host --privileged --rm rhastie/nmos-cpp:latest
-```
 
 ### On a standard Linux host
 
