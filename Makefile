@@ -1,6 +1,6 @@
 NAME = nmos-cpp
 # grab the abrev commit SHA from Dockerfile
-VERSION = 1.1A-$(shell sed -n 's/.*NMOS_CPP_VERSION=\(.......\).*/\1/p' Dockerfile)
+VERSION = 1.2A-$(shell sed -n 's/.*NMOS_CPP_VERSION=\(.......\).*/\1/p' Dockerfile)
 # Get number of processors available and add 1
 NPROC = $(shell echo $(shell nproc)+1 | bc)
 
@@ -21,6 +21,8 @@ buildx: version
 	docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t rhastie/$(NAME):$(VERSION) --build-arg makemt=$(NPROC) --push .
 # Example below on how to push multi-arch manifest to NVIDIA GPU Cloud (NGC)
 #	docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t nvcr.io/nvidian/$(NAME):$(VERSION) --build-arg makemt=$(NPROC) --push .
+# Example below on how to push multi-arch manifest to Git Hub Packages
+#       docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t docker.pkg.github.com/rhastie/build-nmos-cpp/$(NAME):$(VERSION) --build-arg makemt=$(NPROC) --push .
 
 run: build
 	docker run -d -it --net=host --name $(NAME)-registry --rm $(NAME):$(VERSION)

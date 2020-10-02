@@ -5,30 +5,30 @@ LABEL maintainer="richh@mellanox.com"
 ARG makemt
 
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn \
-    NMOS_CPP_VERSION=b0dcf9dc0459c4c6b43be8dfb2f77183bfc4a4a3
+    NMOS_CPP_VERSION=a3eb68a65aed935517087d7e286156cf02a532b8
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -y --no-install-recommends \
     g++ build-essential \
     openssl libssl-dev git wget gnupg curl ca-certificates nano \
     python3 python3-pip python3-setuptools && \
 # Avahi:    dbus avahi-daemon libavahi-compat-libdnssd-dev libnss-mdns AND NOT make \
-    curl -sS -k https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
+    curl -sS -k "https://dl.yarnpkg.com/debian/pubkey.gpg" | apt-key add - && \
     echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
     apt-get update && apt-get install -y --no-install-recommends yarn nodejs && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean -y --no-install-recommends && \
     apt-get autoclean -y --no-install-recommends
 
-## Get and Make CMake version 3.18.0 (latest GA when Dockerfile developed) - Adjust as necessary
-RUN cd /home/ && wget --no-check-certificate https://cmake.org/files/v3.18/cmake-3.18.0.tar.gz && \
-    tar xvf cmake-3.18.0.tar.gz && rm cmake-3.18.0.tar.gz && cd /home/cmake-3.18.0 && \
+## Get and Make CMake version 3.18.3 (latest GA when Dockerfile developed) - Adjust as necessary
+RUN cd /home/ && wget --no-check-certificate https://cmake.org/files/v3.18/cmake-3.18.3.tar.gz && \
+    tar xvf cmake-3.18.3.tar.gz && rm cmake-3.18.3.tar.gz && cd /home/cmake-3.18.3 && \
     ./bootstrap && \
     if [ -n "$makemt" ]; then echo "Making multi-threaded with $makemt jobs"; make -j$makemt; else echo "Making single-threaded"; make; fi && \
     make install
 
 ## Get Conan and it's dependencies
 RUN cd /home/ && git config --global http.sslVerify false && \
-    git clone --branch release/1.27 https://github.com/conan-io/conan.git && \
+    git clone --branch release/1.30 https://github.com/conan-io/conan.git && \
     cd conan && pip3 install wheel && pip3 install -e . && export PYTHONPATH=$PYTHONPATH:$(pwd) && \
     export PYTHONPATH=$PYTHONPATH:$(pwd)
 
@@ -100,7 +100,7 @@ RUN cd /home/nmos-js/Development && \
 ## Move executables, libraries and clean up container as much as possible
 RUN cd /home/nmos-cpp/Development/build && \
     cp nmos-cpp-node nmos-cpp-registry /home && \
-    cd /home && rm -rf .git conan cmake-3.18.0 nmos-cpp nmos-js nmos-web-router
+    cd /home && rm -rf .git conan cmake-3.18.3 nmos-cpp nmos-js nmos-web-router
 
 ## Re-build container for optimised runtime environment using clean Ubuntu Bionic release
 FROM ubuntu:bionic
@@ -110,12 +110,15 @@ COPY --from=stage1-build /home /home
 
 ##Update container with latest patches and needed packages
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -y --no-install-recommends \
-    openssl make \
+    openssl make nano curl jq gnupg && \
 # Avahi:    dbus avahi-daemon libavahi-compat-libdnssd-dev libnss-mdns AND NOT make \
-    mosquitto nano curl jq && \
     cd /home/mDNSResponder-878.260.1/mDNSPosix && make os=linux install && \
     cd /home && rm -rf /home/mDNSResponder-878.260.1 /etc/nsswitch.conf.pre-mdns && \
-    apt-get purge -y make && \
+    curl -sS -k "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x77b7346a59027b33c10cafe35e64e954262c4500" | apt-key add - && \
+    echo "deb http://ppa.launchpad.net/mosquitto-dev/mosquitto-ppa/ubuntu bionic main" | tee /etc/apt/sources.list.d/mosquitto.list && \
+    apt-get update && apt-get install -y --no-install-recommends mosquitto && \
+    apt-get remove --purge -y make gnupg && \
+    apt-get autoremove -y && \
     apt-get clean -y --no-install-recommends && \
     apt-get autoclean -y --no-install-recommends && \
     rm -rf /var/lib/apt/lists/* && \
