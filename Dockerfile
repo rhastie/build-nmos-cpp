@@ -57,8 +57,8 @@ RUN mkdir /home/nmos-cpp/Development/build && \
     cd /home/nmos-cpp/Development/build && \
     cmake \
     -G "Unix Makefiles" \
-    -DCMAKE_BUILD_TYPE:STRING="Release" \
-    -DCMAKE_CONFIGURATION_TYPES:STRING="Release" \
+    -DCMAKE_BUILD_TYPE:STRING="MinSizeRel" \
+    -DCMAKE_CONFIGURATION_TYPES:STRING="MinSizeRel" \
     -DCXXFLAGS:STRING="-Os" \
     -build /home/nmos-cpp/Development/build .. && \
     if [ -n "$makemt" ]; then echo "Making multi-threaded with $makemt jobs"; make -j$makemt; else echo "Making single-threaded"; make; fi
