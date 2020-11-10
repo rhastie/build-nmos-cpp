@@ -5,7 +5,7 @@ LABEL maintainer="richh@mellanox.com"
 ARG makemt
 
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn \
-    NMOS_CPP_VERSION=a3eb68a65aed935517087d7e286156cf02a532b8
+    NMOS_CPP_VERSION=713fb15cd7e0053b146693ca4e1c08ff98893b07
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -y --no-install-recommends \
     g++ build-essential \
@@ -19,16 +19,16 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -
     apt-get clean -y --no-install-recommends && \
     apt-get autoclean -y --no-install-recommends
 
-## Get and Make CMake version 3.18.3 (latest GA when Dockerfile developed) - Adjust as necessary
-RUN cd /home/ && wget --no-check-certificate https://cmake.org/files/v3.18/cmake-3.18.3.tar.gz && \
-    tar xvf cmake-3.18.3.tar.gz && rm cmake-3.18.3.tar.gz && cd /home/cmake-3.18.3 && \
+## Get and Make CMake version 3.18.4 (latest GA when Dockerfile developed) - Adjust as necessary
+RUN cd /home/ && wget --no-check-certificate https://cmake.org/files/v3.18/cmake-3.18.4.tar.gz && \
+    tar xvf cmake-3.18.4.tar.gz && rm cmake-3.18.4.tar.gz && cd /home/cmake-3.18.4 && \
     ./bootstrap && \
     if [ -n "$makemt" ]; then echo "Making multi-threaded with $makemt jobs"; make -j$makemt; else echo "Making single-threaded"; make; fi && \
     make install
 
 ## Get Conan and it's dependencies
 RUN cd /home/ && git config --global http.sslVerify false && \
-    git clone --branch release/1.30 https://github.com/conan-io/conan.git && \
+    git clone --branch release/1.31 https://github.com/conan-io/conan.git && \
     cd conan && pip3 install wheel && pip3 install -e . && export PYTHONPATH=$PYTHONPATH:$(pwd) && \
     export PYTHONPATH=$PYTHONPATH:$(pwd)
 
@@ -100,7 +100,7 @@ RUN cd /home/nmos-js/Development && \
 ## Move executables, libraries and clean up container as much as possible
 RUN cd /home/nmos-cpp/Development/build && \
     cp nmos-cpp-node nmos-cpp-registry /home && \
-    cd /home && rm -rf .git conan cmake-3.18.3 nmos-cpp nmos-js nmos-web-router
+    cd /home && rm -rf .git conan cmake-3.18.4 nmos-cpp nmos-js nmos-web-router
 
 ## Re-build container for optimised runtime environment using clean Ubuntu Bionic release
 FROM ubuntu:bionic
