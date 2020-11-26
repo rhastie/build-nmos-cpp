@@ -1,11 +1,11 @@
 FROM ubuntu:bionic as stage1-build
-MAINTAINER richh@mellanox.com
-LABEL maintainer="richh@mellanox.com"
+MAINTAINER rhastie@nvidia.com
+LABEL maintainer="rhastie@nvidia.com"
 
 ARG makemt
 
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn \
-    NMOS_CPP_VERSION=713fb15cd7e0053b146693ca4e1c08ff98893b07
+    NMOS_CPP_VERSION=5660faa05356ce0d72e80608e35a990fc6085604
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -y --no-install-recommends \
     g++ build-essential \
@@ -20,8 +20,8 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -
     apt-get autoclean -y --no-install-recommends
 
 ## Get and Make CMake version 3.18.4 (latest GA when Dockerfile developed) - Adjust as necessary
-RUN cd /home/ && wget --no-check-certificate https://cmake.org/files/v3.18/cmake-3.18.4.tar.gz && \
-    tar xvf cmake-3.18.4.tar.gz && rm cmake-3.18.4.tar.gz && cd /home/cmake-3.18.4 && \
+RUN cd /home/ && wget --no-check-certificate https://cmake.org/files/v3.19/cmake-3.19.1.tar.gz && \
+    tar xvf cmake-3.19.1.tar.gz && rm cmake-3.19.1.tar.gz && cd /home/cmake-3.19.1 && \
     ./bootstrap && \
     if [ -n "$makemt" ]; then echo "Making multi-threaded with $makemt jobs"; make -j$makemt; else echo "Making single-threaded"; make; fi && \
     make install
@@ -100,7 +100,7 @@ RUN cd /home/nmos-js/Development && \
 ## Move executables, libraries and clean up container as much as possible
 RUN cd /home/nmos-cpp/Development/build && \
     cp nmos-cpp-node nmos-cpp-registry /home && \
-    cd /home && rm -rf .git conan cmake-3.18.4 nmos-cpp nmos-js nmos-web-router
+    cd /home && rm -rf .git conan cmake-3.19.1 nmos-cpp nmos-js nmos-web-router
 
 ## Re-build container for optimised runtime environment using clean Ubuntu Bionic release
 FROM ubuntu:bionic

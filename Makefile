@@ -23,6 +23,8 @@ buildx: version
 #	docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t nvcr.io/nvidian/$(NAME):$(VERSION) --build-arg makemt=$(NPROC) --push .
 # Example below on how to push multi-arch manifest to Git Hub Packages
 #       docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t docker.pkg.github.com/rhastie/build-nmos-cpp/$(NAME):$(VERSION) --build-arg makemt=$(NPROC) --push .
+# Example below on how to push multi-arch manifest to Amazon ECR
+#	docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t 299832127819.dkr.ecr.us-east-1.amazonaws.com/mellanox/$(NAME):$(VERSION) --build-arg makemt=$(NPROC) --push .
 
 run: build
 	docker run -d -it --net=host --name $(NAME)-registry --rm $(NAME):$(VERSION)
