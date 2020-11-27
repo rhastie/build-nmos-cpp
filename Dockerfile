@@ -5,7 +5,7 @@ LABEL maintainer="rhastie@nvidia.com"
 ARG makemt
 
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn \
-    NMOS_CPP_VERSION=5660faa05356ce0d72e80608e35a990fc6085604
+    NMOS_CPP_VERSION=b6c547ff6738753ad978fca94f961385f15ed042
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -y --no-install-recommends \
     g++ build-essential \
@@ -19,7 +19,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -
     apt-get clean -y --no-install-recommends && \
     apt-get autoclean -y --no-install-recommends
 
-## Get and Make CMake version 3.18.4 (latest GA when Dockerfile developed) - Adjust as necessary
+## Get and Make CMake version 3.19.1 (latest GA when Dockerfile developed) - Adjust as necessary
 RUN cd /home/ && wget --no-check-certificate https://cmake.org/files/v3.19/cmake-3.19.1.tar.gz && \
     tar xvf cmake-3.19.1.tar.gz && rm cmake-3.19.1.tar.gz && cd /home/cmake-3.19.1 && \
     ./bootstrap && \
@@ -100,7 +100,7 @@ RUN cd /home/nmos-js/Development && \
 ## Move executables, libraries and clean up container as much as possible
 RUN cd /home/nmos-cpp/Development/build && \
     cp nmos-cpp-node nmos-cpp-registry /home && \
-    cd /home && rm -rf .git conan cmake-3.19.1 nmos-cpp nmos-js nmos-web-router
+    cd /home && rm -rf .git conan cmake-3.19.1 nmos-cpp nmos-js
 
 ## Re-build container for optimised runtime environment using clean Ubuntu Bionic release
 FROM ubuntu:bionic
