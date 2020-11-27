@@ -22,29 +22,29 @@ jobs:
         shell: bash
         run: |
           GITHUB_COMMIT=`sed -n 's/.*NMOS_CPP_VERSION=\(.......\).*/\1/p' Dockerfile`
-          echo "::set-env name=GITHUB_COMMIT::$GITHUB_COMMIT"
+          echo "GITHUB_COMMIT=$GITHUB_COMMIT" >> $GITHUB_ENV
           GITHUB_BRANCH=`echo "${{ github.ref }}" | cut -d'/' -f3`
-          echo "::set-env name=GITHUB_BRANCH::$GITHUB_BRANCH"
-          echo "::set-env name=GITHUB_WORKSPACE::${{ github.workspace }}"
-          echo "::set-env name=RUNNER_WORKSPACE::${{ runner.workspace }}"
-          echo "::set-env name=BUILD_NAME::ubuntu-latest_avahi"
-          echo "::set-env name=TEST_FAIL::FALSE"
+          echo "GITHUB_BRANCH=$GITHUB_BRANCH" >> $GITHUB_ENV
+          echo "GITHUB_WORKSPACE=${{ github.workspace }}" >> $GITHUB_ENV
+          echo "RUNNER_WORKSPACE=${{ runner.workspace }}" >> $GITHUB_ENV
+          echo "BUILD_NAME=ubuntu-latest_avahi" >> $GITHUB_ENV
+          echo "TEST_FAIL=FALSE" >> $GITHUB_ENV
 
       - name: Set platforms and tags
         shell: bash
         run: |
           # BUILD_ARM currently is set to FALSE - GitHub Actions only allows 6 hours for Job completion which isn't enough
           if [[ "${{ secrets.BUILD_ARM }}" == "TRUE" ]] && [[ "${{ env.GITHUB_BRANCH }}" == "master" ]]; then 
-            echo "::set-env name=BUILD_PLATFORMS::linux/amd64,linux/arm64,linux/arm/v7"
+            echo "BUILD_PLATFORMS=linux/amd64,linux/arm64,linux/arm/v7" >> $GITHUB_ENV
           else
-            echo "::set-env name=BUILD_PLATFORMS::linux/amd64"
+            echo "BUILD_PLATFORMS=linux/amd64" >> $GITHUB_ENV
           fi
 
           if [[ "${{ env.GITHUB_BRANCH }}" == "master" ]]; then
-            # echo "::set-env name=BUILD_TAGS::${{ env.GITHUB_BRANCH }}-${{ env.GITHUB_COMMIT }}, latest"
-            echo "::set-env name=BUILD_TAGS::${{ env.GITHUB_BRANCH }}-${{ env.GITHUB_COMMIT }}"
+            # echo "BUILD_TAGS=${{ env.GITHUB_BRANCH }}-${{ env.GITHUB_COMMIT }}, latest" >> $GITHUB_ENV
+            echo "BUILD_TAGS=${{ env.GITHUB_BRANCH }}-${{ env.GITHUB_COMMIT }}" >> $GITHUB_ENV
           else
-            echo "::set-env name=BUILD_TAGS::${{ env.GITHUB_BRANCH }}-${{ env.GITHUB_COMMIT }}"
+            echo "BUILD_TAGS=${{ env.GITHUB_BRANCH }}-${{ env.GITHUB_COMMIT }}" >> $GITHUB_ENV
           fi
 
       - name: Setup Google credentials
@@ -54,12 +54,12 @@ jobs:
         run: |
           mkdir -p gdrive
           echo "${{ env.SECRET_GOOGLE_CREDENTIALS }}" | openssl base64 -d -A -out gdrive/credentials.json
-          echo "::set-env name=GDRIVE_CREDENTIALS::`pwd`/gdrive/credentials.json"
+          echo "GDRIVE_CREDENTIALS=`pwd`/gdrive/credentials.json" >> $GITHUB_ENV
 
       - name: Get IP Host Address
         run: |
           hostip=$(ip -4 addr show eth0 | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
-          echo "::set-env name=HOST_IP_ADDRESS::$hostip"
+          echo "HOST_IP_ADDRESS=$hostip" >> $GITHUB_ENV
           echo "Using HOST IP Address: $hostip"
           ip address
 
@@ -155,7 +155,7 @@ jobs:
             shift
             case $($run_test suite ${suite} --selection all "$@" --output "results/${{ env.GITHUB_COMMIT }}-${{ env.BUILD_NAME }}-${{ env.GITHUB_BRANCH }}-${suite}.json" >> results/testoutput 2>&1; echo $?) in
             [0-1])  echo "Pass" > badges/${suite}.txt ;;
-            *)      echo "Fail" > badges/${suite}.txt; echo "::set-env name=TEST_FAIL::TRUE" ;;
+            *)      echo "Fail" > badges/${suite}.txt; echo "TEST_FAIL=TRUE" >> $GITHUB_ENV ;;
             esac
           }
 
@@ -208,7 +208,7 @@ jobs:
             shift
             case $($run_test suite ${suite} --selection all "$@" --output "results/${{ env.GITHUB_COMMIT }}-${{ env.BUILD_NAME }}-${{ env.GITHUB_BRANCH }}-${suite}.json" >> results/testoutput 2>&1; echo $?) in
             [0-1])  echo "Pass" > badges/${suite}.txt ;;
-            *)      echo "Fail" > badges/${suite}.txt; echo "::set-env name=TEST_FAIL::TRUE" ;;
+            *)      echo "Fail" > badges/${suite}.txt; echo "TEST_FAIL=TRUE" >> $GITHUB_ENV ;;
             esac
           }
 
@@ -355,9 +355,9 @@ jobs:
         shell: bash
         run: |
           GITHUB_COMMIT=`echo "${{ github.sha }}" | cut -c1-7`
-          echo "::set-env name=GITHUB_COMMIT::$GITHUB_COMMIT"
-          echo "::set-env name=GITHUB_WORKSPACE::${{ github.workspace }}"
-          echo "::set-env name=RUNNER_WORKSPACE::${{ runner.workspace }}"
+          echo "GITHUB_COMMIT=$GITHUB_COMMIT" >> $GITHUB_ENV
+          echo "GITHUB_WORKSPACE=${{ github.workspace }}" >> $GITHUB_ENV
+          echo "RUNNER_WORKSPACE=${{ runner.workspace }}" >> $GITHUB_ENV
 
       - uses: actions/download-artifact@v2
         with:
