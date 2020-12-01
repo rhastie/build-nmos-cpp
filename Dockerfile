@@ -5,7 +5,7 @@ LABEL maintainer="rhastie@nvidia.com"
 ARG makemt
 
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn \
-    NMOS_CPP_VERSION=b6c547ff6738753ad978fca94f961385f15ed042
+    NMOS_CPP_VERSION=e97ab77dd09590748ccd007b977d9f30dfac0dd3
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -y --no-install-recommends \
     g++ build-essential \

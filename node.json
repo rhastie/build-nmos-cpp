@@ -2,6 +2,6 @@
 "logging_level": 0,
 "http_port": 11000,
 "events_ws_port": 11001,
-"label": "mellanox-container-node",
+"label": "nvidia-container-node",
 "how_many": 5
 }
