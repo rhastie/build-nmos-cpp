@@ -5,7 +5,7 @@ LABEL maintainer="rhastie@nvidia.com"
 ARG makemt
 
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn \
-    NMOS_CPP_VERSION=e97ab77dd09590748ccd007b977d9f30dfac0dd3
+    NMOS_CPP_VERSION=c38f782c4d6ff7a622ae1248064fcb59984d1c03
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -y --no-install-recommends \
     g++ build-essential \
@@ -14,6 +14,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -
 # Avahi:    dbus avahi-daemon libavahi-compat-libdnssd-dev libnss-mdns AND NOT make \
     curl -sS -k "https://dl.yarnpkg.com/debian/pubkey.gpg" | apt-key add - && \
     echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
+    curl -sL https://deb.nodesource.com/setup_15.x | bash - && \
     apt-get update && apt-get install -y --no-install-recommends yarn nodejs && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean -y --no-install-recommends && \
@@ -22,13 +23,13 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -
 ## Get and Make CMake version 3.19.1 (latest GA when Dockerfile developed) - Adjust as necessary
 RUN cd /home/ && wget --no-check-certificate https://cmake.org/files/v3.19/cmake-3.19.1.tar.gz && \
     tar xvf cmake-3.19.1.tar.gz && rm cmake-3.19.1.tar.gz && cd /home/cmake-3.19.1 && \
-    ./bootstrap && \
+    if [ -n "$makemt" ]; then echo "Bootstrapping multi-threaded with $makemt jobs"; ./bootstrap --parallel=$makemt; else echo "Bootstrapping single-threaded"; ./bootstrap; fi && \
     if [ -n "$makemt" ]; then echo "Making multi-threaded with $makemt jobs"; make -j$makemt; else echo "Making single-threaded"; make; fi && \
     make install
 
 ## Get Conan and it's dependencies
 RUN cd /home/ && git config --global http.sslVerify false && \
-    git clone --branch release/1.31 https://github.com/conan-io/conan.git && \
+    git clone --branch release/1.32 https://github.com/conan-io/conan.git && \
     cd conan && pip3 install wheel && pip3 install -e . && export PYTHONPATH=$PYTHONPATH:$(pwd) && \
     export PYTHONPATH=$PYTHONPATH:$(pwd)
 
