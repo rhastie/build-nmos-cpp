@@ -157,7 +157,7 @@ else
     if cfg_haskey mqtt_port; then
         mqtt_port=$(cfg_read mqtt_port)
         echo -e "\nSetting MQTT Broker port to $mqtt_port"
-        echo -e "\n#Automatically added by entrypoint.sh script on execution\nlistener $mqtt_port\n" >> /etc/mosquitto/mosquitto.conf
+        echo -e "\n#Automatically added by entrypoint.sh script on execution\nlistener $mqtt_port 0.0.0.0\nallow_anonymous true\n" >> /etc/mosquitto/mosquitto.conf
     else
         echo -e "\nUsing default MQTT Broker port of 1883"
     fi

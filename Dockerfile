@@ -4,8 +4,7 @@ LABEL maintainer="rhastie@nvidia.com"
 
 ARG makemt
 
-ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn \
-    NMOS_CPP_VERSION=c38f782c4d6ff7a622ae1248064fcb59984d1c03
+ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -y --no-install-recommends \
     g++ build-essential \
@@ -20,9 +19,9 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -
     apt-get clean -y --no-install-recommends && \
     apt-get autoclean -y --no-install-recommends
 
-## Get and Make CMake version 3.19.1 (latest GA when Dockerfile developed) - Adjust as necessary
-RUN cd /home/ && wget --no-check-certificate https://cmake.org/files/v3.19/cmake-3.19.1.tar.gz && \
-    tar xvf cmake-3.19.1.tar.gz && rm cmake-3.19.1.tar.gz && cd /home/cmake-3.19.1 && \
+## Get and Make CMake version 3.19.2 (latest GA when Dockerfile developed) - Adjust as necessary
+RUN cd /home/ && wget --no-check-certificate https://cmake.org/files/v3.19/cmake-3.19.2.tar.gz && \
+    tar xvf cmake-3.19.2.tar.gz && rm cmake-3.19.2.tar.gz && cd /home/cmake-3.19.2 && \
     if [ -n "$makemt" ]; then echo "Bootstrapping multi-threaded with $makemt jobs"; ./bootstrap --parallel=$makemt; else echo "Bootstrapping single-threaded"; ./bootstrap; fi && \
     if [ -n "$makemt" ]; then echo "Making multi-threaded with $makemt jobs"; make -j$makemt; else echo "Making single-threaded"; make; fi && \
     make install
@@ -40,6 +39,7 @@ RUN cd /home && mkdir certs && git config --global http.sslVerify false && \
     rm -rf /home/nmos-testing
 
 ## Get source for Sony nmos-cpp/
+ENV NMOS_CPP_VERSION=479280ae9d9d23c0da61e4210b6f09f6027864e4
 RUN cd /home/ && curl --output - -s -k https://codeload.github.com/sony/nmos-cpp/tar.gz/$NMOS_CPP_VERSION | tar zxvf - -C . && \
     mv ./nmos-cpp-${NMOS_CPP_VERSION} ./nmos-cpp
 
@@ -101,7 +101,7 @@ RUN cd /home/nmos-js/Development && \
 ## Move executables, libraries and clean up container as much as possible
 RUN cd /home/nmos-cpp/Development/build && \
     cp nmos-cpp-node nmos-cpp-registry /home && \
-    cd /home && rm -rf .git conan cmake-3.19.1 nmos-cpp nmos-js
+    cd /home && rm -rf .git conan cmake-3.19.2 nmos-cpp nmos-js
 
 ## Re-build container for optimised runtime environment using clean Ubuntu Bionic release
 FROM ubuntu:bionic
