@@ -294,8 +294,8 @@ jobs:
           tag: ${{ env.BUILD_TAGS }}
           buildArg: makemt=3
           platform: ${{ env.BUILD_PLATFORMS }}
-          dockerHubUser: ${{ secrets.DockerHub_User }}
-          dockerHubPassword: ${{ secrets.DockerHub_Password }}
+          dockerUser: ${{ secrets.DockerHub_User }}
+          dockerPassword: ${{ secrets.DockerHub_Password }}
 
       - name: Upload results to google sheets
         working-directory: ${{ env.RUNNER_WORKSPACE }}
