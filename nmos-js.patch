@@ -36,7 +36,7 @@ diff -ruN nmos-js/Development/src/index.css nmos-js.new/Development/src/index.cs
 diff -ruN nmos-js/Development/src/pages/nodes/NodesShow.js nmos-js.new/Development/src/pages/nodes/NodesShow.js
 --- nmos-js/Development/src/pages/nodes/NodesShow.js	2020-12-10 22:34:16.609294790 +0000
 +++ nmos-js.new/Development/src/pages/nodes/NodesShow.js	2020-12-10 22:30:47.940358236 +0000
-@@ -105,7 +105,7 @@
+@@ -84,7 +84,7 @@
                                      >
                                          <LinkIcon
                                              style={{
