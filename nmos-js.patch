@@ -1,6 +1,6 @@
 diff -ruN nmos-js/Development/public/index.html nmos-js.new/Development/public/index.html
---- nmos-js/Development/public/index.html	2020-12-10 22:34:16.605295229 +0000
-+++ nmos-js.new/Development/public/index.html	2020-12-10 22:30:47.940358236 +0000
+--- nmos-js/Development/public/index.html	2021-01-29 19:07:48.385554963 +0000
++++ nmos-js.new/Development/public/index.html	2021-01-29 18:55:20.325152928 +0000
 @@ -18,7 +18,7 @@
        work correctly both with client-side routing and a non-root public URL.
        Learn how to configure a non-root public URL by running `npm run build`.
@@ -11,8 +11,8 @@ diff -ruN nmos-js/Development/public/index.html nmos-js.new/Development/public/i
    <body>
      <noscript>
 diff -ruN nmos-js/Development/public/manifest.json nmos-js.new/Development/public/manifest.json
---- nmos-js/Development/public/manifest.json	2020-12-10 22:34:16.605295229 +0000
-+++ nmos-js.new/Development/public/manifest.json	2020-12-10 22:30:47.940358236 +0000
+--- nmos-js/Development/public/manifest.json	2021-01-29 19:07:48.385554963 +0000
++++ nmos-js.new/Development/public/manifest.json	2021-01-29 18:55:20.325152928 +0000
 @@ -1,6 +1,6 @@
  {
    "short_name": "nmos-js",
@@ -22,8 +22,8 @@ diff -ruN nmos-js/Development/public/manifest.json nmos-js.new/Development/publi
    "display": "standalone",
    "theme_color": "#2196f3",
 diff -ruN nmos-js/Development/src/index.css nmos-js.new/Development/src/index.css
---- nmos-js/Development/src/index.css	2020-12-10 22:34:16.609294790 +0000
-+++ nmos-js.new/Development/src/index.css	2020-12-10 22:30:47.940358236 +0000
+--- nmos-js/Development/src/index.css	2021-01-29 19:07:48.389554736 +0000
++++ nmos-js.new/Development/src/index.css	2021-01-29 18:55:20.325152928 +0000
 @@ -36,7 +36,7 @@
  }
  
@@ -34,8 +34,8 @@ diff -ruN nmos-js/Development/src/index.css nmos-js.new/Development/src/index.cs
  
  .inverted {
 diff -ruN nmos-js/Development/src/pages/nodes/NodesShow.js nmos-js.new/Development/src/pages/nodes/NodesShow.js
---- nmos-js/Development/src/pages/nodes/NodesShow.js	2020-12-10 22:34:16.609294790 +0000
-+++ nmos-js.new/Development/src/pages/nodes/NodesShow.js	2020-12-10 22:30:47.940358236 +0000
+--- nmos-js/Development/src/pages/nodes/NodesShow.js	2021-01-29 19:07:48.393554509 +0000
++++ nmos-js.new/Development/src/pages/nodes/NodesShow.js	2021-01-29 18:55:20.325152928 +0000
 @@ -84,7 +84,7 @@
                                      >
                                          <LinkIcon
@@ -46,18 +46,18 @@ diff -ruN nmos-js/Development/src/pages/nodes/NodesShow.js nmos-js.new/Developme
                                              }}
                                          />
 diff -ruN nmos-js/Development/src/pages/settings.js nmos-js.new/Development/src/pages/settings.js
---- nmos-js/Development/src/pages/settings.js	2020-12-10 22:34:16.609294790 +0000
-+++ nmos-js.new/Development/src/pages/settings.js	2020-12-11 15:16:16.204411359 +0000
-@@ -15,7 +15,7 @@
+--- nmos-js/Development/src/pages/settings.js	2021-01-29 19:07:48.393554509 +0000
++++ nmos-js.new/Development/src/pages/settings.js	2021-01-29 19:00:51.870972911 +0000
+@@ -12,7 +12,7 @@
+     makeStyles,
  } from '@material-ui/core';
- import SaveIcon from '@material-ui/icons/Save';
  
 -import sealion from '../assets/sea-lion.png';
 +import sealion from '../assets/NVIDIA_Logo_H_ForScreen_ForLightBG.png';
  import {
      DNSSD_API,
-     LOGGING_API,
-@@ -40,7 +40,7 @@
+     FRIENDLY_PARAMETERS,
+@@ -39,7 +39,7 @@
      textField: {
          marginLeft: theme.spacing(1),
          marginRight: theme.spacing(1),
@@ -70,7 +70,7 @@ diff -ruN nmos-js/Development/src/pages/settings.js nmos-js.new/Development/src/
          <div style={{ paddingTop: '24px' }}>
              <Card>
                  <CardHeader
--                    title="Welcome to the nmos&#8209;js Client"
+-                    title="nmos&#8209;js Settings"
 +                    title="NVIDIA NMOS Commissioning Controller"
                      titleTypographyProps={{ variant: 'h2', align: 'center' }}
                  />
@@ -95,22 +95,22 @@ diff -ruN nmos-js/Development/src/pages/settings.js nmos-js.new/Development/src/
 +                        and{' '}
 +                        <a href="https://github.com/sony/nmos-js">nmos-js</a>
 +                    </p>
-                 </CardContent>
-             </Card>
-             <Card align="center" title="Change Query">
+                     <List>
+                         {!hiddenSetting(QUERY_API) && (
+                             <ListItem className={classes.listItem}>
 diff -ruN nmos-js/Development/src/theme/ThemeContext.js nmos-js.new/Development/src/theme/ThemeContext.js
---- nmos-js/Development/src/theme/ThemeContext.js	2020-12-10 22:34:16.609294790 +0000
-+++ nmos-js.new/Development/src/theme/ThemeContext.js	2020-12-10 23:45:22.133577073 +0000
+--- nmos-js/Development/src/theme/ThemeContext.js	2021-01-29 19:07:48.393554509 +0000
++++ nmos-js.new/Development/src/theme/ThemeContext.js	2021-01-29 19:03:44.268024404 +0000
 @@ -1,7 +1,7 @@
  import React from 'react';
  import { ThemeProvider } from '@material-ui/styles';
  import { createMuiTheme, responsiveFontSizes } from '@material-ui/core/styles';
 -import { blue, lightBlue } from '@material-ui/core/colors';
 +//import { blue, lightBlue } from '@material-ui/core/colors';
+ import { disabledSetting, useJSONSetting } from '../settings';
  
  export const ThemeContext = React.createContext({
-     theme: 'light',
-@@ -16,8 +16,14 @@
+@@ -17,8 +17,14 @@
      const theme = responsiveFontSizes(
          createMuiTheme({
              palette: {
@@ -124,6 +124,6 @@ diff -ruN nmos-js/Development/src/theme/ThemeContext.js nmos-js.new/Development/
 +                    main: '#76b900',
 +                    contrastText: '#ffffff',
 +                },
-                 type: themeState.mode,
+                 type: themeState.type,
              },
              sidebar: {

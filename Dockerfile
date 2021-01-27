@@ -39,7 +39,7 @@ RUN cd /home && mkdir certs && git config --global http.sslVerify false && \
     rm -rf /home/nmos-testing
 
 ## Get source for Sony nmos-cpp/
-ENV NMOS_CPP_VERSION=41d983cee3e416470ac4e62ff92b059bfc1ecdc7
+ENV NMOS_CPP_VERSION=e5068599d1f371b553b87154e11f83f85c9ba5df
 RUN cd /home/ && curl --output - -s -k https://codeload.github.com/sony/nmos-cpp/tar.gz/$NMOS_CPP_VERSION | tar zxvf - -C . && \
     mv ./nmos-cpp-${NMOS_CPP_VERSION} ./nmos-cpp
 
