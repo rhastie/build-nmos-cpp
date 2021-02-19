@@ -26,13 +26,13 @@ Specifically the implementation supports the following specifications:
 Additionally it supports the following additional components:
 
 - Supports auto identification of the switch Boundary Clock PTP Domain which is published via the AMWA IS-09 System Resource when run on a Mellanox switch
-- Supports an embedded NMOS Browser Client/Controller which supports NMOS Control using AMWA IS-05. This implementation does not currently support AMWA IS-08
+- Supports an embedded NMOS Browser Client/Controller which supports NMOS Control using AMWA IS-05. This implementation also supports AMWA IS-08 but currently view-only.
 - Supports an embedded MQTT Broker (mosquitto) to allow simplified use of the NMOS MQTT Transport type for AMWA IS-05 and IS-07 
 - Supports a DNS-SD Bridge to HTML implementation that supports both mDNS and DNS-SD
 
 The nmos-cpp container includes implementations of the NMOS Node, Registration and Query APIs, and the NMOS Connection API. It also included a NMOS Browser Client/Controller in JavaScript, a MQTT Broker and a DNS-SD API which aren't part of the specifications.
 
-## Container Testing and supported architectures
+## Container Testing, supported architectures and Release Notes
 
 ### JT-NM Tested
 
@@ -112,6 +112,20 @@ The [AMWA NMOS API Testing Tool](https://github.com/AMWA-TV/nmos-testing) is aut
 [IS-09-01-sheet]: https://docs.google.com/spreadsheets/d/1xtxALyCpr5cR4zHwjnW12b8wAOf2uvL0QBLFCPgdE1A/edit#gid=919453974
 [IS-09-02-sheet]: https://docs.google.com/spreadsheets/d/1xtxALyCpr5cR4zHwjnW12b8wAOf2uvL0QBLFCPgdE1A/edit#gid=2135469955
 [MQTT-Broker-link]: https://mosquitto.org/man/mosquitto-8.html
+
+### Release Notes and Versioning
+
+The NVIDIA NMOS docker container even though it is continuously being developed we endeavour to make packages available at various major points. [Docker Hub](https://hub.docker.com/r/rhastie/nmos-cpp/tags?page=1&ordering=last_updated) always provides a list of various tags which relate as follows:
+
+- latest - Will always map to the very latest formally released version of the container.
+- 1.XY-CCCCCCC - Where X is a number, Y is a letter and C is a nmos-cpp commit reference - Mulit-arch, formal release that has been published post testing. These versions will be preserved as long as Docker Hub allows
+- dev-CCCCCCC - Where C is a nmos-cpp commit reference - None multi-arch, dev branch testing - This version should not be relied upon and can be removed without notice.
+- master-CCCCCCC - Where C is a nmos-cpp commit reference - None multi-arch, master branch testing - This version should not be relied upon can be removed without notice.
+- 0.1X - Where X is a letter - Legacy versions of the container before it was formally released.
+
+In addition to Docker Hub we also maintain an aligned set of release pacakges on GitHub - [NVIDIA NMOS Docker container releases](https://github.com/rhastie/build-nmos-cpp/releases)
+
+For the formally released versions of the container you can follow the [Release Notes](https://github.com/rhastie/build-nmos-cpp/blob/master/Release-Notes.md) documentation to see what has changed.
 
 ## How to install and run the container NMOS Registry/Controller
 
