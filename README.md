@@ -26,7 +26,7 @@ Specifically the implementation supports the following specifications:
 Additionally it supports the following additional components:
 
 - Supports auto identification of the switch Boundary Clock PTP Domain which is published via the AMWA IS-09 System Resource when run on a Mellanox switch
-- Supports an embedded NMOS Browser Client/Controller which supports NMOS Control using AMWA IS-05. This implementation does not currently support AMWA IS-08
+- Supports an embedded NMOS Browser Client/Controller which supports NMOS Control using AMWA IS-05. This implementation also supports AMWA IS-08 but currently view-only.
 - Supports an embedded MQTT Broker (mosquitto) to allow simplified use of the NMOS MQTT Transport type for AMWA IS-05 and IS-07 
 - Supports a DNS-SD Bridge to HTML implementation that supports both mDNS and DNS-SD
 
