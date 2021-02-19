@@ -19,9 +19,9 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -
     apt-get clean -y --no-install-recommends && \
     apt-get autoclean -y --no-install-recommends
 
-## Get and Make CMake version 3.19.3 (latest GA when Dockerfile developed) - Adjust as necessary
-RUN cd /home/ && wget --no-check-certificate https://cmake.org/files/v3.19/cmake-3.19.3.tar.gz && \
-    tar xvf cmake-3.19.3.tar.gz && rm cmake-3.19.3.tar.gz && cd /home/cmake-3.19.3 && \
+## Get and Make CMake version 3.19.5 (latest GA when Dockerfile developed) - Adjust as necessary
+RUN cd /home/ && wget --no-check-certificate https://cmake.org/files/v3.19/cmake-3.19.5.tar.gz && \
+    tar xvf cmake-3.19.5.tar.gz && rm cmake-3.19.5.tar.gz && cd /home/cmake-3.19.5 && \
     if [ -n "$makemt" ]; then echo "Bootstrapping multi-threaded with $makemt jobs"; ./bootstrap --parallel=$makemt; else echo "Bootstrapping single-threaded"; ./bootstrap; fi && \
     if [ -n "$makemt" ]; then echo "Making multi-threaded with $makemt jobs"; make -j$makemt; else echo "Making single-threaded"; make; fi && \
     make install
@@ -39,7 +39,7 @@ RUN cd /home && mkdir certs && git config --global http.sslVerify false && \
     rm -rf /home/nmos-testing
 
 ## Get source for Sony nmos-cpp/
-ENV NMOS_CPP_VERSION=e5068599d1f371b553b87154e11f83f85c9ba5df
+ENV NMOS_CPP_VERSION=3a57c8fec5968be27dcc0e881197c6ef1e4940a8
 RUN cd /home/ && curl --output - -s -k https://codeload.github.com/sony/nmos-cpp/tar.gz/$NMOS_CPP_VERSION | tar zxvf - -C . && \
     mv ./nmos-cpp-${NMOS_CPP_VERSION} ./nmos-cpp
 
@@ -81,8 +81,7 @@ RUN cd /home/ && mkdir example-conf && mkdir admin
 ADD example-conf /home/example-conf
 
 ## Get and build source for Sony nmos-js
-RUN cd /home/ && git config --global http.sslVerify false && \
-    git clone https://github.com/sony/nmos-js.git
+RUN cd /home/ && git config --global http.sslVerify false && git clone https://github.com/sony/nmos-js.git
 
 ## Custom branding
 COPY NVIDIA_Logo_H_ForScreen_ForLightBG.png nmos-js.patch /home/nmos-js/Development/src/assets/
@@ -101,7 +100,7 @@ RUN cd /home/nmos-js/Development && \
 ## Move executables, libraries and clean up container as much as possible
 RUN cd /home/nmos-cpp/Development/build && \
     cp nmos-cpp-node nmos-cpp-registry /home && \
-    cd /home && rm -rf .git conan cmake-3.19.3 nmos-cpp nmos-js
+    cd /home && rm -rf .git conan cmake-3.19.5 nmos-cpp nmos-js
 
 ## Re-build container for optimised runtime environment using clean Ubuntu Bionic release
 FROM ubuntu:bionic
