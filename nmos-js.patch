@@ -1,129 +1,48 @@
-diff -ruN nmos-js/Development/public/index.html nmos-js.new/Development/public/index.html
---- nmos-js/Development/public/index.html	2021-01-29 19:07:48.385554963 +0000
-+++ nmos-js.new/Development/public/index.html	2021-01-29 18:55:20.325152928 +0000
-@@ -18,7 +18,7 @@
-       work correctly both with client-side routing and a non-root public URL.
-       Learn how to configure a non-root public URL by running `npm run build`.
-     -->
--    <title>nmos-js client</title>
-+    <title>NVIDIA NMOS Commissioning Controller</title>
-   </head>
-   <body>
-     <noscript>
 diff -ruN nmos-js/Development/public/manifest.json nmos-js.new/Development/public/manifest.json
---- nmos-js/Development/public/manifest.json	2021-01-29 19:07:48.385554963 +0000
-+++ nmos-js.new/Development/public/manifest.json	2021-01-29 18:55:20.325152928 +0000
-@@ -1,6 +1,6 @@
+--- nmos-js/Development/public/manifest.json
++++ nmos-js.new/Development/public/manifest.json
+@@ -1,7 +1,8 @@
  {
    "short_name": "nmos-js",
--  "name": "nmos-js client",
 +  "name": "NVIDIA NMOS Commissioning Controller",
    "start_url": "./index.html",
    "display": "standalone",
-   "theme_color": "#2196f3",
-diff -ruN nmos-js/Development/src/index.css nmos-js.new/Development/src/index.css
---- nmos-js/Development/src/index.css	2021-01-29 19:07:48.389554736 +0000
-+++ nmos-js.new/Development/src/index.css	2021-01-29 18:55:20.325152928 +0000
-@@ -36,7 +36,7 @@
+-  "theme_color": "rgb(0,47,103)",
++  "theme_color": "#76b900",
+   "background_color": "#ffffff"
  }
+diff -ruN nmos-js/Development/src/components/AppLogo.js nmos-js.new/Development/src/components/AppLogo.js
+--- nmos-js/Development/src/components/AppLogo.js
++++ nmos-js.new/Development/src/components/AppLogo.js
+@@ -1,8 +1,9 @@
+-import AppLogoAsset from '../assets/sea-lion.png';
++import AppLogoAsset from '../assets/NVIDIA_Logo_H_ForScreen_ForLightBG.png';
  
- .addFilter.blue{
--  color: rgb(33, 150, 243);
-+  color: rgb(118, 185, 0);
- }
- 
- .inverted {
-diff -ruN nmos-js/Development/src/pages/nodes/NodesShow.js nmos-js.new/Development/src/pages/nodes/NodesShow.js
---- nmos-js/Development/src/pages/nodes/NodesShow.js	2021-01-29 19:07:48.393554509 +0000
-+++ nmos-js.new/Development/src/pages/nodes/NodesShow.js	2021-01-29 18:55:20.325152928 +0000
-@@ -84,7 +84,7 @@
-                                     >
-                                         <LinkIcon
-                                             style={{
--                                                color: '#2196f3',
-+                                                color: '#76b900',
-                                                 preserveAspectRatio: 'xMidYMin',
-                                             }}
-                                         />
-diff -ruN nmos-js/Development/src/pages/settings.js nmos-js.new/Development/src/pages/settings.js
---- nmos-js/Development/src/pages/settings.js	2021-01-29 19:07:48.393554509 +0000
-+++ nmos-js.new/Development/src/pages/settings.js	2021-01-29 19:00:51.870972911 +0000
-@@ -12,7 +12,7 @@
-     makeStyles,
- } from '@material-ui/core';
- 
--import sealion from '../assets/sea-lion.png';
-+import sealion from '../assets/NVIDIA_Logo_H_ForScreen_ForLightBG.png';
- import {
-     DNSSD_API,
-     FRIENDLY_PARAMETERS,
-@@ -39,7 +39,7 @@
-     textField: {
-         marginLeft: theme.spacing(1),
-         marginRight: theme.spacing(1),
--        width: 350,
-+        width: 450,
+ const AppLogoStyle = {
++    backgroundColor: 'white',
+     border: '1px solid lightgray',
+-    borderRadius: '50%',
++    borderRadius: '25px',
+     padding: '4px',
+     margin: '16px',
+     maxWidth: '50%',
+diff -ruN nmos-js/Development/src/config.json nmos-js.new/Development/src/config.json
+--- nmos-js/Development/src/config.json
++++ nmos-js.new/Development/src/config.json
+@@ -1,13 +1,13 @@
+ {
+     "title": "nmos-js",
+-    "about": "An NMOS Client",
++    "about": "NVIDIA NMOS Commissioning Controller",
+     "palette": {
+         "primary": {
+-            "main": "rgb(45,117,199)",
++            "main": "#76b900",
+             "contrastText": "#fff"
+         },
+         "secondary": {
+-            "main": "rgb(0,47,103)",
++            "main": "#76b900",
+             "contrastText": "#fff"
+         }
      },
- }));
- 
-@@ -104,7 +104,7 @@
-         <div style={{ paddingTop: '24px' }}>
-             <Card>
-                 <CardHeader
--                    title="nmos&#8209;js Settings"
-+                    title="NVIDIA NMOS Commissioning Controller"
-                     titleTypographyProps={{ variant: 'h2', align: 'center' }}
-                 />
-                 <CardContent align="center">
-@@ -113,12 +113,19 @@
-                         src={sealion}
-                         style={{
-                             border: '1px solid lightgray',
--                            borderRadius: '50%',
-+                            borderRadius: '25px',
-+                            backgroundColor: 'white',
-                             padding: '4px',
--                            width: '20%',
-+                            width: '40%',
-                         }}
--                        alt="sea-lion logo"
-+                        alt="NVIDIA Logo"
-                     />
-+                    <p>
-+                        Built using open-source code from projects{' '}
-+                        <a href="https://github.com/sony/nmos-cpp">nmos-cpp</a>{' '}
-+                        and{' '}
-+                        <a href="https://github.com/sony/nmos-js">nmos-js</a>
-+                    </p>
-                     <List>
-                         {!hiddenSetting(QUERY_API) && (
-                             <ListItem className={classes.listItem}>
-diff -ruN nmos-js/Development/src/theme/ThemeContext.js nmos-js.new/Development/src/theme/ThemeContext.js
---- nmos-js/Development/src/theme/ThemeContext.js	2021-01-29 19:07:48.393554509 +0000
-+++ nmos-js.new/Development/src/theme/ThemeContext.js	2021-01-29 19:03:44.268024404 +0000
-@@ -1,7 +1,7 @@
- import React from 'react';
- import { ThemeProvider } from '@material-ui/styles';
- import { createMuiTheme, responsiveFontSizes } from '@material-ui/core/styles';
--import { blue, lightBlue } from '@material-ui/core/colors';
-+//import { blue, lightBlue } from '@material-ui/core/colors';
- import { disabledSetting, useJSONSetting } from '../settings';
- 
- export const ThemeContext = React.createContext({
-@@ -17,8 +17,14 @@
-     const theme = responsiveFontSizes(
-         createMuiTheme({
-             palette: {
--                primary: lightBlue,
--                secondary: blue,
-+                primary: {
-+                    main: '#76b900',
-+                    contrastText: '#ffffff',
-+                },
-+                secondary: {
-+                    main: '#76b900',
-+                    contrastText: '#ffffff',
-+                },
-                 type: themeState.type,
-             },
-             sidebar: {
