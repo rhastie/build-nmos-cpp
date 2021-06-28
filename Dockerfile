@@ -13,22 +13,23 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -
 # Avahi:    dbus avahi-daemon libavahi-compat-libdnssd-dev libnss-mdns AND NOT make \
     curl -sS -k "https://dl.yarnpkg.com/debian/pubkey.gpg" | apt-key add - && \
     echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
-    curl -sL https://deb.nodesource.com/setup_15.x | bash - && \
+    curl -sL https://deb.nodesource.com/setup_16.x | bash - && \
     apt-get update && apt-get install -y --no-install-recommends yarn nodejs && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean -y --no-install-recommends && \
     apt-get autoclean -y --no-install-recommends
 
-## Get and Make CMake version 3.19.5 (latest GA when Dockerfile developed) - Adjust as necessary
-RUN cd /home/ && wget --no-check-certificate https://cmake.org/files/v3.19/cmake-3.19.5.tar.gz && \
-    tar xvf cmake-3.19.5.tar.gz && rm cmake-3.19.5.tar.gz && cd /home/cmake-3.19.5 && \
+## Get and Make CMake version 3.20.5 (latest GA when Dockerfile developed) - Adjust as necessary
+RUN cd /home/ && wget --no-check-certificate https://cmake.org/files/v3.20/cmake-3.20.5.tar.gz && \
+    tar xvf cmake-3.20.5.tar.gz && rm cmake-3.20.5.tar.gz && cd /home/cmake-3.20.5 && \
     if [ -n "$makemt" ]; then echo "Bootstrapping multi-threaded with $makemt jobs"; ./bootstrap --parallel=$makemt; else echo "Bootstrapping single-threaded"; ./bootstrap; fi && \
     if [ -n "$makemt" ]; then echo "Making multi-threaded with $makemt jobs"; make -j$makemt; else echo "Making single-threaded"; make; fi && \
     make install
 
-## Get Conan v1.33.x and it's dependencies
+## Get Conan v1.37.x and it's dependencies
 RUN cd /home/ && git config --global http.sslVerify false && \
-    git clone --branch release/1.33 https://github.com/conan-io/conan.git && \
+    git clone --branch release/1.37 https://github.com/conan-io/conan.git && \
+    pip3 install --upgrade setuptools && \
     cd conan && pip3 install wheel && pip3 install -e . && export PYTHONPATH=$PYTHONPATH:$(pwd) && \
     export PYTHONPATH=$PYTHONPATH:$(pwd)
 
@@ -39,7 +40,7 @@ RUN cd /home && mkdir certs && git config --global http.sslVerify false && \
     rm -rf /home/nmos-testing
 
 ## Get source for Sony nmos-cpp/
-ENV NMOS_CPP_VERSION=3a57c8fec5968be27dcc0e881197c6ef1e4940a8
+ENV NMOS_CPP_VERSION=86d5467785a316d33a44fff4f71198a4a8996020
 RUN cd /home/ && curl --output - -s -k https://codeload.github.com/sony/nmos-cpp/tar.gz/$NMOS_CPP_VERSION | tar zxvf - -C . && \
     mv ./nmos-cpp-${NMOS_CPP_VERSION} ./nmos-cpp
 
@@ -61,7 +62,7 @@ RUN mkdir /home/nmos-cpp/Development/build && \
     -DCMAKE_BUILD_TYPE:STRING="MinSizeRel" \
     -DCMAKE_CONFIGURATION_TYPES:STRING="MinSizeRel" \
     -DCXXFLAGS:STRING="-Os" \
-    -build /home/nmos-cpp/Development/build .. && \
+    /home/nmos-cpp/Development/build .. && \
     if [ -n "$makemt" ]; then echo "Making multi-threaded with $makemt jobs"; make -j$makemt; else echo "Making single-threaded"; make; fi
 
 ## Generate Example Certificates and position into correct locations
@@ -100,7 +101,7 @@ RUN cd /home/nmos-js/Development && \
 ## Move executables, libraries and clean up container as much as possible
 RUN cd /home/nmos-cpp/Development/build && \
     cp nmos-cpp-node nmos-cpp-registry /home && \
-    cd /home && rm -rf .git conan cmake-3.19.5 nmos-cpp nmos-js
+    cd /home && rm -rf .git conan cmake-3.20.5 nmos-cpp nmos-js
 
 ## Re-build container for optimised runtime environment using clean Ubuntu Bionic release
 FROM ubuntu:bionic
