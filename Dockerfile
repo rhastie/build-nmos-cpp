@@ -19,11 +19,19 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -
     apt-get clean -y --no-install-recommends && \
     apt-get autoclean -y --no-install-recommends
 
-## Install latest CMake version
-RUN python3 -m pip install --upgrade pip && pip3 install cmake
+## Get and Make CMake version 3.21.2 (latest GA when Dockerfile developed) - Adjust as necessary
+RUN cd /home/ && wget --no-check-certificate https://cmake.org/files/v3.21/cmake-3.21.2.tar.gz && \
+    tar xvf cmake-3.21.2.tar.gz && rm cmake-3.21.2.tar.gz && cd /home/cmake-3.21.2 && \
+    if [ -n "$makemt" ]; then echo "Bootstrapping multi-threaded with $makemt jobs"; ./bootstrap --parallel=$makemt; else echo "Bootstrapping single-threaded"; ./bootstrap; fi && \
+    if [ -n "$makemt" ]; then echo "Making multi-threaded with $makemt jobs"; make -j$makemt; else echo "Making single-threaded"; make; fi && \
+    make install
 
-## Install latest Conan version
-RUN pip3 install conan
+## Get Conan v1.39.x and it's dependencies
+RUN cd /home/ && git config --global http.sslVerify false && \
+    git clone --branch release/1.39 https://github.com/conan-io/conan.git && \
+    pip3 install --upgrade setuptools && \
+    cd conan && pip3 install wheel && pip3 install -e . && export PYTHONPATH=$PYTHONPATH:$(pwd) && \
+    export PYTHONPATH=$PYTHONPATH:$(pwd)
 
 ## Get Certificates and scripts from AMWA-TV/nmos-testing
 RUN cd /home && mkdir certs && git config --global http.sslVerify false && \
@@ -32,7 +40,7 @@ RUN cd /home && mkdir certs && git config --global http.sslVerify false && \
     rm -rf /home/nmos-testing
 
 ## Get source for Sony nmos-cpp/
-ENV NMOS_CPP_VERSION=41d584f5b3401c2d2011ecd1b8fef79caa3ae44d
+ENV NMOS_CPP_VERSION=d3a8c7935f80ce5de6d4727c307ddcef667b5d57
 RUN cd /home/ && curl --output - -s -k https://codeload.github.com/sony/nmos-cpp/tar.gz/$NMOS_CPP_VERSION | tar zxvf - -C . && \
     mv ./nmos-cpp-${NMOS_CPP_VERSION} ./nmos-cpp
 
