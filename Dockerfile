@@ -19,16 +19,16 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -
     apt-get clean -y --no-install-recommends && \
     apt-get autoclean -y --no-install-recommends
 
-## Get and Make CMake version 3.21.2 (latest GA when Dockerfile developed) - Adjust as necessary
-RUN cd /home/ && wget --no-check-certificate https://cmake.org/files/v3.21/cmake-3.21.2.tar.gz && \
-    tar xvf cmake-3.21.2.tar.gz && rm cmake-3.21.2.tar.gz && cd /home/cmake-3.21.2 && \
+## Get and Make CMake version 3.22.0 (latest GA when Dockerfile developed) - Adjust as necessary
+RUN cd /home/ && wget --no-check-certificate https://cmake.org/files/v3.22/cmake-3.22.0.tar.gz && \
+    tar xvf cmake-3.22.0.tar.gz && rm cmake-3.22.0.tar.gz && cd /home/cmake-3.22.0 && \
     if [ -n "$makemt" ]; then echo "Bootstrapping multi-threaded with $makemt jobs"; ./bootstrap --parallel=$makemt; else echo "Bootstrapping single-threaded"; ./bootstrap; fi && \
     if [ -n "$makemt" ]; then echo "Making multi-threaded with $makemt jobs"; make -j$makemt; else echo "Making single-threaded"; make; fi && \
     make install
 
-## Get Conan v1.39.x and it's dependencies
+## Get Conan v1.42.x and it's dependencies
 RUN cd /home/ && git config --global http.sslVerify false && \
-    git clone --branch release/1.39 https://github.com/conan-io/conan.git && \
+    git clone --branch release/1.42 https://github.com/conan-io/conan.git && \
     pip3 install --upgrade setuptools && \
     cd conan && pip3 install wheel && pip3 install -e . && export PYTHONPATH=$PYTHONPATH:$(pwd) && \
     export PYTHONPATH=$PYTHONPATH:$(pwd)
@@ -40,7 +40,7 @@ RUN cd /home && mkdir certs && git config --global http.sslVerify false && \
     rm -rf /home/nmos-testing
 
 ## Get source for Sony nmos-cpp/
-ENV NMOS_CPP_VERSION=d3a8c7935f80ce5de6d4727c307ddcef667b5d57
+ENV NMOS_CPP_VERSION=95536ae32341046dabf66286b373d70e97e3a59a
 RUN cd /home/ && curl --output - -s -k https://codeload.github.com/sony/nmos-cpp/tar.gz/$NMOS_CPP_VERSION | tar zxvf - -C . && \
     mv ./nmos-cpp-${NMOS_CPP_VERSION} ./nmos-cpp
 
@@ -101,7 +101,7 @@ RUN cd /home/nmos-js/Development && \
 ## Move executables, libraries and clean up container as much as possible
 RUN cd /home/nmos-cpp/Development/build && \
     cp nmos-cpp-node nmos-cpp-registry /home && \
-    cd /home && rm -rf .git conan cmake-3.21.2 nmos-cpp nmos-js
+    cd /home && rm -rf .git conan cmake-3.22.0 nmos-cpp nmos-js
 
 ## Re-build container for optimised runtime environment using clean Ubuntu Bionic release
 FROM ubuntu:bionic
