@@ -92,7 +92,7 @@ if cfg_haskey update_ptp_domain && [ "$(cfg_read update_ptp_domain)" = "TRUE" ];
     # Test for being on a Mellanox switch
     json_data="{\"username\": \""$username"\", \"password\": \""$password"\", \"cmd\": \"show ptp\", \"execution_type\": \"sync\"}"
     echo "Sending JSON: "$json_data
-    curl -k -L -X POST -d "$json_data" -c /dev/null \
+    curl -k -L -X POST -d "$json_data" -c /dev/null --connect-timeout 5 \
     "https://localhost/admin/launch?script=rh&template=json-request&action=json-login" > /home/ptp_data
 
     # If Error Code is 0 - Then we must be running on a Mellanox switch
