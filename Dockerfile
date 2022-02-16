@@ -1,4 +1,4 @@
-FROM ubuntu:bionic as stage1-build
+FROM ubuntu:focal as stage1-build
 MAINTAINER rhastie@nvidia.com
 LABEL maintainer="rhastie@nvidia.com"
 
@@ -19,19 +19,22 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -
     apt-get clean -y --no-install-recommends && \
     apt-get autoclean -y --no-install-recommends
 
-## Get and Make CMake version 3.22.0 (latest GA when Dockerfile developed) - Adjust as necessary
-RUN cd /home/ && wget --no-check-certificate https://cmake.org/files/v3.22/cmake-3.22.0.tar.gz && \
-    tar xvf cmake-3.22.0.tar.gz && rm cmake-3.22.0.tar.gz && cd /home/cmake-3.22.0 && \
-    if [ -n "$makemt" ]; then echo "Bootstrapping multi-threaded with $makemt jobs"; ./bootstrap --parallel=$makemt; else echo "Bootstrapping single-threaded"; ./bootstrap; fi && \
-    if [ -n "$makemt" ]; then echo "Making multi-threaded with $makemt jobs"; make -j$makemt; else echo "Making single-threaded"; make; fi && \
-    make install
+## Get and Make CMake version 3.22.2 (latest GA when Dockerfile developed) - Adjust as necessary
+#RUN cd /home/ && wget --no-check-certificate https://cmake.org/files/v3.22/cmake-3.22.2.tar.gz && \
+#    tar xvf cmake-3.22.2.tar.gz && rm cmake-3.22.2.tar.gz && cd /home/cmake-3.22.2 && \
+#    if [ -n "$makemt" ]; then echo "Bootstrapping multi-threaded with $makemt jobs"; ./bootstrap --parallel=$makemt; else echo "Bootstrapping single-threaded"; ./bootstrap; fi && \
+#    if [ -n "$makemt" ]; then echo "Making multi-threaded with $makemt jobs"; make -j$makemt; else echo "Making single-threaded"; make; fi && \
+#    make install
 
-## Get Conan v1.42.x and it's dependencies
-RUN cd /home/ && git config --global http.sslVerify false && \
-    git clone --branch release/1.42 https://github.com/conan-io/conan.git && \
-    pip3 install --upgrade setuptools && \
-    cd conan && pip3 install wheel && pip3 install -e . && export PYTHONPATH=$PYTHONPATH:$(pwd) && \
-    export PYTHONPATH=$PYTHONPATH:$(pwd)
+## Get Conan v1.45.x and it's dependencies
+#RUN cd /home/ && git config --global http.sslVerify false && \
+#    git clone --branch release/1.45 https://github.com/conan-io/conan.git && \
+#    pip3 install --upgrade setuptools && \
+#    cd conan && pip3 install wheel && python3 -m pip install -e .
+#ENV PYTHONPATH "/home/conan"
+
+##Install latest versions of CMake and Conan using pip3 package installer
+RUN python3 -m pip install --upgrade pip setuptools wheel cmake conan
 
 ## Get Certificates and scripts from AMWA-TV/nmos-testing
 RUN cd /home && mkdir certs && git config --global http.sslVerify false && \
@@ -40,7 +43,7 @@ RUN cd /home && mkdir certs && git config --global http.sslVerify false && \
     rm -rf /home/nmos-testing
 
 ## Get source for Sony nmos-cpp/
-ENV NMOS_CPP_VERSION=95536ae32341046dabf66286b373d70e97e3a59a
+ENV NMOS_CPP_VERSION=7ca64c4fb5604fb8a3e0c05db2e8f8ffe7ef3857
 RUN cd /home/ && curl --output - -s -k https://codeload.github.com/sony/nmos-cpp/tar.gz/$NMOS_CPP_VERSION | tar zxvf - -C . && \
     mv ./nmos-cpp-${NMOS_CPP_VERSION} ./nmos-cpp
 
@@ -61,6 +64,7 @@ RUN mkdir /home/nmos-cpp/Development/build && \
     -G "Unix Makefiles" \
     -DCMAKE_BUILD_TYPE:STRING="MinSizeRel" \
     -DCMAKE_CONFIGURATION_TYPES:STRING="MinSizeRel" \
+    -DCXXFLAGS:STRING="-Os" \
     -DNMOS_CPP_USE_AVAHI:BOOL="0" \
     /home/nmos-cpp/Development/build .. && \
     if [ -n "$makemt" ]; then echo "Making multi-threaded with $makemt jobs"; make -j$makemt; else echo "Making single-threaded"; make; fi
@@ -101,10 +105,10 @@ RUN cd /home/nmos-js/Development && \
 ## Move executables, libraries and clean up container as much as possible
 RUN cd /home/nmos-cpp/Development/build && \
     cp nmos-cpp-node nmos-cpp-registry /home && \
-    cd /home && rm -rf .git conan cmake-3.22.0 nmos-cpp nmos-js
+    cd /home && rm -rf .git nmos-cpp nmos-js
 
 ## Re-build container for optimised runtime environment using clean Ubuntu Bionic release
-FROM ubuntu:bionic
+FROM ubuntu:focal
 
 ##Copy required files from build container
 COPY --from=stage1-build /home /home
@@ -116,7 +120,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -
     cd /home/mDNSResponder-878.260.1/mDNSPosix && make os=linux install && \
     cd /home && rm -rf /home/mDNSResponder-878.260.1 /etc/nsswitch.conf.pre-mdns && \
     curl -sS -k "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x77b7346a59027b33c10cafe35e64e954262c4500" | apt-key add - && \
-    echo "deb http://ppa.launchpad.net/mosquitto-dev/mosquitto-ppa/ubuntu bionic main" | tee /etc/apt/sources.list.d/mosquitto.list && \
+    echo "deb http://ppa.launchpad.net/mosquitto-dev/mosquitto-ppa/ubuntu focal main" | tee /etc/apt/sources.list.d/mosquitto.list && \
     apt-get update && apt-get install -y --no-install-recommends mosquitto && \
     apt-get remove --purge -y make gnupg && \
     apt-get autoremove -y && \
@@ -135,6 +139,9 @@ RUN chmod +x /home/entrypoint.sh
 ##Set default config variable to run registry (FALSE) or node (TRUE)
 ARG runnode=FALSE
 ENV RUN_NODE=$runnode
+
+##Expose correct default ports to allow quick publishing
+EXPOSE 8010 8011 11000 11001 1883
 
 WORKDIR /home/
 ENTRYPOINT ["/home/entrypoint.sh"]
