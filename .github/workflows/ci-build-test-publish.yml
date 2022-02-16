@@ -35,7 +35,7 @@ jobs:
         run: |
           # BUILD_ARM currently is set to FALSE - GitHub Actions only allows 6 hours for Job completion which isn't enough
           if [[ "${{ secrets.BUILD_ARM }}" == "TRUE" ]] && [[ "${{ env.GITHUB_BRANCH }}" == "master" ]]; then 
-            echo "BUILD_PLATFORMS=linux/amd64,linux/arm64,linux/arm/v7" >> $GITHUB_ENV
+            echo "BUILD_PLATFORMS=linux/amd64,linux/arm64" >> $GITHUB_ENV
           else
             echo "BUILD_PLATFORMS=linux/amd64" >> $GITHUB_ENV
           fi
@@ -133,7 +133,7 @@ jobs:
           pip install -r requirements.txt
 
           # Install SDPoker
-          sudo npm install -g AMWA-TV/sdpoker
+          npm install -g git+https://git@github.com/AMWA-TV/sdpoker.git
 
           pip install -r utilities/run-test-suites/gsheetsImport/requirements.txt
 

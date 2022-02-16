@@ -11,10 +11,8 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -
     openssl libssl-dev git wget gnupg curl ca-certificates nano \
     python3 python3-pip python3-setuptools && \
 # Avahi:    dbus avahi-daemon libavahi-compat-libdnssd-dev libnss-mdns AND NOT make \
-    curl -sS -k "https://dl.yarnpkg.com/debian/pubkey.gpg" | apt-key add - && \
-    echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
     curl -sL https://deb.nodesource.com/setup_16.x | bash - && \
-    apt-get update && apt-get install -y --no-install-recommends yarn nodejs && \
+    apt-get update && apt-get install -y --no-install-recommends nodejs && corepack enable && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean -y --no-install-recommends && \
     apt-get autoclean -y --no-install-recommends
