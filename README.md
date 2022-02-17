@@ -157,7 +157,7 @@ On a Mellanox switch the DNS configuration used by the container is inherited fr
 
 Prerequisites:
 
-- It's generally recommended to use the Ubuntu 18.04+ based BFB (Bluefield bootstream) image as this contains all necessary drivers and OS as a single bundle. See [download page](https://www.mellanox.com/products/software/bluefield)
+- It's generally recommended to use the Ubuntu 20.04+ based BFB (Bluefield bootstream) image as this contains all necessary drivers and OS as a single bundle. See [download page](https://www.mellanox.com/products/software/bluefield)
 - Have an accurate date and time
 - Make sure external connectivity and name resolution are available from the SmartNIC Ubuntu OS - There are several ways that this can be done. Please review the Bluefield documentation
 - Docker is generally provided under the Mellanox BFB image, but if not available, install a full Docker CE environment using [instructions](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
@@ -174,7 +174,7 @@ docker run -it --net=host --privileged --rm rhastie/nmos-cpp:latest
 
 Prerequisites:
 
-- It's generally recommended to run the very latest JetPack from NVIDIA (JetPack 4.3 at the time of testing)
+- It's generally recommended to run the very latest JetPack from NVIDIA (JetPack 4.6 at the time of testing)
 - Have an accurate date and time
 - Docker is generally provided under the NVIDIA JetPack image, but if not available, install a full Docker CE environment using [instructions](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
 - Set [docker permission](https://superuser.com/questions/835696/how-solve-permission-problems-for-docker-in-ubuntu#853682) for your host user
@@ -186,13 +186,13 @@ docker pull rhastie/nmos-cpp:latest
 docker run -it --net=host --privileged --rm rhastie/nmos-cpp:latest
 ```
 
-### Raspberry Pi RPi 3 Model B and RPi 4 Model B
+### Raspberry Pi Models 3B, 3B+, 3A+, 4, 400, CM3, CM3+, CM4 and Zero 2 W
 
 Prerequisites:
 
-- It's generally recommended to run latest version of Raspbian (Buster at the time of testing)
+- It's generally recommended to run the latest version of [Raspberry Pi OS 64-bit](https://downloads.raspberrypi.org/raspios_arm64/images/) (Bullseye at the time of testing)
 - Have an accurate date and time
-- If using Raspbian Buster you can installed Docker using "sudo apt-get install docker.io". If using older versions of Raspbian install a full Docker CE environment using [instructions](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
+- If using Raspberry Pi OS 64-bit Bullseye you can installed Docker using "sudo apt-get install docker.io". If using older versions of Raspbian install a full Docker CE environment using [instructions](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
 - Set [docker permission](https://superuser.com/questions/835696/how-solve-permission-problems-for-docker-in-ubuntu#853682) for your host user
 
 Execute the follow Linux commands to download and run the container on the host:
