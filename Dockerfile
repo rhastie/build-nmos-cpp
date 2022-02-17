@@ -17,21 +17,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -
     apt-get clean -y --no-install-recommends && \
     apt-get autoclean -y --no-install-recommends
 
-## Get and Make CMake version 3.22.2 (latest GA when Dockerfile developed) - Adjust as necessary
-#RUN cd /home/ && wget --no-check-certificate https://cmake.org/files/v3.22/cmake-3.22.2.tar.gz && \
-#    tar xvf cmake-3.22.2.tar.gz && rm cmake-3.22.2.tar.gz && cd /home/cmake-3.22.2 && \
-#    if [ -n "$makemt" ]; then echo "Bootstrapping multi-threaded with $makemt jobs"; ./bootstrap --parallel=$makemt; else echo "Bootstrapping single-threaded"; ./bootstrap; fi && \
-#    if [ -n "$makemt" ]; then echo "Making multi-threaded with $makemt jobs"; make -j$makemt; else echo "Making single-threaded"; make; fi && \
-#    make install
-
-## Get Conan v1.45.x and it's dependencies
-#RUN cd /home/ && git config --global http.sslVerify false && \
-#    git clone --branch release/1.45 https://github.com/conan-io/conan.git && \
-#    pip3 install --upgrade setuptools && \
-#    cd conan && pip3 install wheel && python3 -m pip install -e .
-#ENV PYTHONPATH "/home/conan"
-
-##Install latest versions of CMake and Conan using pip3 package installer
+## Install latest versions of CMake and Conan using pip3 package installer
 RUN python3 -m pip install --upgrade pip setuptools wheel cmake conan
 
 ## Get Certificates and scripts from AMWA-TV/nmos-testing
@@ -62,7 +48,6 @@ RUN mkdir /home/nmos-cpp/Development/build && \
     -G "Unix Makefiles" \
     -DCMAKE_BUILD_TYPE:STRING="MinSizeRel" \
     -DCMAKE_CONFIGURATION_TYPES:STRING="MinSizeRel" \
-    -DCXXFLAGS:STRING="-Os" \
     -DNMOS_CPP_USE_AVAHI:BOOL="0" \
     /home/nmos-cpp/Development/build .. && \
     if [ -n "$makemt" ]; then echo "Making multi-threaded with $makemt jobs"; make -j$makemt; else echo "Making single-threaded"; make; fi
