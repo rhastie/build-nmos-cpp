@@ -33,9 +33,8 @@ jobs:
       - name: Set platforms and tags
         shell: bash
         run: |
-          # BUILD_ARM currently is set to FALSE - GitHub Actions only allows 6 hours for Job completion which isn't enough
-          if [[ "${{ secrets.BUILD_ARM }}" == "TRUE" ]] && [[ "${{ env.GITHUB_BRANCH }}" == "master" ]]; then 
-            echo "BUILD_PLATFORMS=linux/amd64,linux/arm64" >> $GITHUB_ENV
+          if [[ "${{ secrets.BUILD_PLATFORMS }}" ]] && [[ "${{ env.GITHUB_BRANCH }}" == "master" ]]; then 
+            echo "BUILD_PLATFORMS=${{ secrets.BUILD_PLATFORMS }}" >> $GITHUB_ENV
           else
             echo "BUILD_PLATFORMS=linux/amd64" >> $GITHUB_ENV
           fi
