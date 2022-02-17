@@ -39,9 +39,8 @@ jobs:
             echo "BUILD_PLATFORMS=linux/amd64" >> $GITHUB_ENV
           fi
 
-          if [[ "${{ env.GITHUB_BRANCH }}" == "master" ]]; then
-            # echo "BUILD_TAGS=${{ env.GITHUB_BRANCH }}-${{ env.GITHUB_COMMIT }}, latest" >> $GITHUB_ENV
-            echo "BUILD_TAGS=${{ env.GITHUB_BRANCH }}-${{ env.GITHUB_COMMIT }}" >> $GITHUB_ENV
+          if [[ "${{ secrets.PUSH_LATEST }}" == "TRUE" ]] && [[ "${{ env.GITHUB_BRANCH }}" == "master" ]]; then
+            echo "BUILD_TAGS=${{ env.GITHUB_BRANCH }}-${{ env.GITHUB_COMMIT }}, latest" >> $GITHUB_ENV
           else
             echo "BUILD_TAGS=${{ env.GITHUB_BRANCH }}-${{ env.GITHUB_COMMIT }}" >> $GITHUB_ENV
           fi
