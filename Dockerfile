@@ -125,7 +125,7 @@ ARG runnode=FALSE
 ENV RUN_NODE=$runnode
 
 ##Expose correct default ports to allow quick publishing
-EXPOSE 8010 8011 11000 11001 1883
+EXPOSE 8010 8011 11000 11001 1883 5353/udp
 
 WORKDIR /home/
 ENTRYPOINT ["/home/entrypoint.sh"]
