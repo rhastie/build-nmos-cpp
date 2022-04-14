@@ -9,7 +9,7 @@ ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -y --no-install-recommends \
     g++ build-essential \
     openssl libssl-dev git wget gnupg curl ca-certificates nano \
-    python3 python3-pip python3-setuptools && \
+    python3 python3-pip python3-setuptools rdma-core && \
 # Avahi:    dbus avahi-daemon libavahi-compat-libdnssd-dev libnss-mdns AND NOT make \
     curl -sL https://deb.nodesource.com/setup_16.x | bash - && \
     apt-get update && apt-get install -y --no-install-recommends nodejs && corepack enable && \
@@ -98,7 +98,7 @@ COPY --from=stage1-build /home /home
 
 ##Update container with latest patches and needed packages
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -y --no-install-recommends \
-    openssl make nano curl jq gnupg && \
+    openssl make nano curl jq gnupg rdma-core && \
 # Avahi:    dbus avahi-daemon libavahi-compat-libdnssd-dev libnss-mdns AND NOT make \
     cd /home/mDNSResponder-878.260.1/mDNSPosix && make os=linux install && \
     cd /home && rm -rf /home/mDNSResponder-878.260.1 /etc/nsswitch.conf.pre-mdns && \
