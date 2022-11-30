@@ -15,13 +15,14 @@ The resulting Docker Container is specifically optimised to operate on a Mellano
 
 Specifically the implementation supports the following specifications:
 
-- [AMWA IS-04 NMOS Discovery and Registration Specification](https://amwa-tv.github.io/nmos-discovery-registration) (supporting v1.0-v1.3)
-- [AMWA IS-05 NMOS Connection Management Specification](https://amwa-tv.github.io/nmos-device-connection-management) (supporting v1.0-v1.1)
-- [AMWA IS-07 NMOS Event & Tally Specification](https://amwa-tv.github.io/nmos-event-tally) (supporting v1.1)
-- [AMWA IS-08 NMOS Audio Channel Mapping Specification](https://amwa-tv.github.io/nmos-audio-channel-mapping) (supporting v1.0)
-- [AMWA IS-09 NMOS System Specification](https://amwa-tv.github.io/nmos-system) (originally defined in JT-NM TR-1001-1:2018 Annex A) (supporting v1.0)
-- [AMWA BCP-002-01 NMOS Grouping Recommendations](https://amwa-tv.github.io/nmos-grouping) - Natural Grouping
-- [AMWA BCP-003-01 NMOS API Security Recommendations](https://amwa-tv.github.io/nmos-api-security) - Securing Communications
+- [AMWA IS-04 NMOS Discovery and Registration Specification](https://specs.amwa.tv/is-04/) (supporting v1.0-v1.3)
+- [AMWA IS-05 NMOS Device Connection Management Specification](https://specs.amwa.tv/is-05/) (supporting v1.0-v1.1)
+- [AMWA IS-07 NMOS Event & Tally Specification](https://specs.amwa.tv/is-07/) (supporting v1.0)
+- [AMWA IS-08 NMOS Audio Channel Mapping Specification](https://specs.amwa.tv/is-08/) (supporting v1.0)
+- [AMWA IS-09 NMOS System Parameters Specification](https://specs.amwa.tv/is-09/) (supporting v1.0)
+- [AMWA BCP-002-01 NMOS Grouping Recommendations - Natural Grouping](https://specs.amwa.tv/bcp-002-01/)
+- [AMWA BCP-003-01 Secure Communication in NMOS Systems](https://specs.amwa.tv/bcp-003-01/)
+- [AMWA BCP-004-01 NMOS Receiver Capabilities](https://specs.amwa.tv/bcp-004-01/)
 
 Additionally it supports the following additional components:
 
