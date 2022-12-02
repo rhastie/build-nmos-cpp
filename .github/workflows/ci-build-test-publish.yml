@@ -120,8 +120,8 @@ jobs:
           set -x
           root_dir=`pwd`
 
-          # Install AMWA test suite.  Use the bcp-006-01 branch
-          git clone -b bcp-006-01 https://github.com/AMWA-TV/nmos-testing.git
+          # Install AMWA test suite. 
+          git clone https://github.com/AMWA-TV/nmos-testing.git
           cd nmos-testing
 
           # Create output directories
@@ -133,7 +133,7 @@ jobs:
           pip install -r requirements.txt
 
           # Install SDPoker
-          npm install -g "git://github.com/AMWA-TV/sdpoker.git#bcp-006-01-rbg"
+          npm install -g git://github.com/AMWA-TV/sdpoker.git
           pip install -r utilities/run-test-suites/gsheetsImport/requirements.txt
 
       - name: Run AMWA Test suite against Node
