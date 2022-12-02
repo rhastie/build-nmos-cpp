@@ -7,6 +7,8 @@ on:
   pull_request:
     branches: [dev, master]
 
+  workflow_dispatch:
+
 env:
   SECRET_GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
   SECRET_RESULTS_SHEET_ID: ${{ secrets.RESULTS_SHEET_ID }}
@@ -70,7 +72,7 @@ jobs:
           dockerfile: Dockerfile
           publish: false
           load: true
-          imageName: rhastie/nmos-cpp
+          imageName: ${{ secrets.Docker_Image_Name }}
           tag: ${{ env.GITHUB_BRANCH }}
           buildArg: makemt=3
           platform: linux/amd64
@@ -108,7 +110,7 @@ jobs:
 
       - name: Start Node Docker container for Node tests
         working-directory: ${{ env.RUNNER_WORKSPACE }}
-        run: docker run -it -d --net=host --name nmos-cpp-node -v="$(pwd)/node.json:/home/node.json" -e "RUN_NODE=TRUE" rhastie/nmos-cpp:${{ env.GITHUB_BRANCH }}
+        run: docker run -it -d --net=host --name nmos-cpp-node -v="$(pwd)/node.json:/home/node.json" -e "RUN_NODE=TRUE" ${{ secrets.Docker_Image_Name }}:${{ env.GITHUB_BRANCH }}
 
       - name: Install AMWA Test suite
         shell: bash
@@ -184,9 +186,9 @@ jobs:
         run: |
           docker container stop nmos-cpp-node
           docker container rm nmos-cpp-node
-          docker run -it -d --net=host --name nmos-cpp-registry -v="$(pwd)/registry.json:/home/registry.json" -e "RUN_NODE=FALSE" rhastie/nmos-cpp:${{ env.GITHUB_BRANCH }}
+          docker run -it -d --net=host --name nmos-cpp-registry -v="$(pwd)/registry.json:/home/registry.json" -e "RUN_NODE=FALSE" ${{ secrets.Docker_Image_Name }}:${{ env.GITHUB_BRANCH }}
           sleep 5
-          docker run -it -d --net=host --name nmos-cpp-node -v="$(pwd)/node.json:/home/node.json" -e "RUN_NODE=TRUE" rhastie/nmos-cpp:${{ env.GITHUB_BRANCH }}
+          docker run -it -d --net=host --name nmos-cpp-node -v="$(pwd)/node.json:/home/node.json" -e "RUN_NODE=TRUE" ${{ secrets.Docker_Image_Name }}:${{ env.GITHUB_BRANCH }}
 
       - name: Run AMWA Test suite against Registry
         shell: bash
