@@ -34,12 +34,12 @@ RUN cd /home/ && curl --output - -s -k https://codeload.github.com/sony/nmos-cpp
 ## You should use either Avahi or Apple mDNS - DO NOT use both
 ##
 ## mDNSResponder 878.260.1 Build and install
-RUN cd /home/ && wget --no-check-certificate https://opensource.apple.com/tarballs/mDNSResponder/mDNSResponder-878.260.1.tar.gz && \
-    tar xvf mDNSResponder-878.260.1.tar.gz && rm mDNSResponder-878.260.1.tar.gz && \
-    patch -d mDNSResponder-878.260.1/ -p1 <nmos-cpp/Development/third_party/mDNSResponder/unicast.patch && \
-    patch -d mDNSResponder-878.260.1/ -p1 <nmos-cpp/Development/third_party/mDNSResponder/permit-over-long-service-types.patch && \
-    patch -d mDNSResponder-878.260.1/ -p1 <nmos-cpp/Development/third_party/mDNSResponder/poll-rather-than-select.patch && \
-    cd /home/mDNSResponder-878.260.1/mDNSPosix && make os=linux && make os=linux install
+RUN cd /home/ && curl --output - -s -k https://codeload.github.com/apple-oss-distributions/mDNSResponder/tar.gz/mDNSResponder-878.260.1 | tar zxvf - -C . && \
+    mv ./mDNSResponder-mDNSResponder-878.260.1 ./mDNSResponder && \
+    patch -d mDNSResponder/ -p1 <nmos-cpp/Development/third_party/mDNSResponder/unicast.patch && \
+    patch -d mDNSResponder/ -p1 <nmos-cpp/Development/third_party/mDNSResponder/permit-over-long-service-types.patch && \
+    patch -d mDNSResponder/ -p1 <nmos-cpp/Development/third_party/mDNSResponder/poll-rather-than-select.patch && \
+    cd /home/mDNSResponder/mDNSPosix && make os=linux && make os=linux install
 
 ## Build Sony nmos-cpp from sources
 RUN mkdir /home/nmos-cpp/Development/build && \
@@ -101,8 +101,8 @@ COPY --from=stage1-build /home /home
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -y --no-install-recommends \
     openssl make nano curl jq gnupg rdma-core && \
 # Avahi:    dbus avahi-daemon libavahi-compat-libdnssd-dev libnss-mdns AND NOT make \
-    cd /home/mDNSResponder-878.260.1/mDNSPosix && make os=linux install && \
-    cd /home && rm -rf /home/mDNSResponder-878.260.1 /etc/nsswitch.conf.pre-mdns && \
+    cd /home/mDNSResponder/mDNSPosix && make os=linux install && \
+    cd /home && rm -rf /home/mDNSResponder /etc/nsswitch.conf.pre-mdns && \
     curl -sS -k "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x77b7346a59027b33c10cafe35e64e954262c4500" | apt-key add - && \
     echo "deb http://ppa.launchpad.net/mosquitto-dev/mosquitto-ppa/ubuntu focal main" | tee /etc/apt/sources.list.d/mosquitto.list && \
     apt-get update && apt-get install -y --no-install-recommends mosquitto && \
