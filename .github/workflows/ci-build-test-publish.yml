@@ -282,7 +282,7 @@ jobs:
           ip address
           
       - name: If Passes tests, Docker Buildx and publish x86 image to Docker Hub
-        if: env.TEST_FAIL == 'FALSE'
+        if: env.TEST_FAIL == 'FALSE' && (env.GITHUB_BRANCH == 'master' || env.GITHUB_BRANCH == 'dev')
         uses: ilteoood/docker_buildx@master
         with:
           dockerfile: Dockerfile
@@ -296,6 +296,7 @@ jobs:
           dockerPassword: ${{ secrets.DockerHub_Password }}
 
       - name: Upload results to google sheets
+        if: env.TEST_FAIL == 'FALSE' && (env.GITHUB_BRANCH == 'master' || env.GITHUB_BRANCH == 'dev')
         working-directory: ${{ env.RUNNER_WORKSPACE }}
         shell: bash
         run: |
