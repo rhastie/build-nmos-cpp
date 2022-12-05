@@ -6,6 +6,8 @@ on:
 
   pull_request:
     branches: [dev, master]
+    
+  workflow_dispatch:
 
 env:
   SECRET_GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
@@ -70,7 +72,7 @@ jobs:
           dockerfile: Dockerfile
           publish: false
           load: true
-          imageName: rhastie/nmos-cpp
+          imageName: ${{ secrets.Docker_Image_Name }}
           tag: ${{ env.GITHUB_BRANCH }}
           buildArg: makemt=3
           platform: linux/amd64
@@ -108,7 +110,7 @@ jobs:
 
       - name: Start Node Docker container for Node tests
         working-directory: ${{ env.RUNNER_WORKSPACE }}
-        run: docker run -it -d --net=host --name nmos-cpp-node -v="$(pwd)/node.json:/home/node.json" -e "RUN_NODE=TRUE" rhastie/nmos-cpp:${{ env.GITHUB_BRANCH }}
+        run: docker run -it -d --net=host --name nmos-cpp-node -v="$(pwd)/node.json:/home/node.json" -e "RUN_NODE=TRUE" ${{ secrets.Docker_Image_Name }}:${{ env.GITHUB_BRANCH }}
 
       - name: Install AMWA Test suite
         shell: bash
@@ -184,9 +186,9 @@ jobs:
         run: |
           docker container stop nmos-cpp-node
           docker container rm nmos-cpp-node
-          docker run -it -d --net=host --name nmos-cpp-registry -v="$(pwd)/registry.json:/home/registry.json" -e "RUN_NODE=FALSE" rhastie/nmos-cpp:${{ env.GITHUB_BRANCH }}
+          docker run -it -d --net=host --name nmos-cpp-registry -v="$(pwd)/registry.json:/home/registry.json" -e "RUN_NODE=FALSE" ${{ secrets.Docker_Image_Name }}:${{ env.GITHUB_BRANCH }}
           sleep 5
-          docker run -it -d --net=host --name nmos-cpp-node -v="$(pwd)/node.json:/home/node.json" -e "RUN_NODE=TRUE" rhastie/nmos-cpp:${{ env.GITHUB_BRANCH }}
+          docker run -it -d --net=host --name nmos-cpp-node -v="$(pwd)/node.json:/home/node.json" -e "RUN_NODE=TRUE" ${{ secrets.Docker_Image_Name }}:${{ env.GITHUB_BRANCH }}
 
       - name: Run AMWA Test suite against Registry
         shell: bash
@@ -288,7 +290,7 @@ jobs:
           dockerfile: Dockerfile
           publish: true
           load: false
-          imageName: rhastie/nmos-cpp
+          imageName: ${{ secrets.Docker_Image_Name }}
           tag: ${{ env.BUILD_TAGS }}
           buildArg: makemt=3
           platform: ${{ env.BUILD_PLATFORMS }}
@@ -311,7 +313,7 @@ jobs:
       #   with:
       #     user: ${{ secrets.DockerHub_User }}
       #     pass: ${{ secrets.DockerHub_Password }}
-      #     slug: rhastie/nmos-cpp
+      #     slug: ${{ secrets.Docker_Image_Name }}
 
       - name: If Passes tests, build image file of x86 container
         if: env.TEST_FAIL == 'FALSE'
@@ -321,7 +323,7 @@ jobs:
           # Make directory and build image from container in Docker image repository
           mkdir container-image
           cd container-image
-          docker save rhastie/nmos-cpp:${{ env.GITHUB_BRANCH }}| gzip > nmos-cpp_${{ env.GITHUB_BRANCH }}-${{ env.GITHUB_COMMIT }}.img.tar.gz
+          docker save ${{ secrets.Docker_Image_Name }}:${{ env.GITHUB_BRANCH }}| gzip > nmos-cpp_${{ env.GITHUB_BRANCH }}-${{ env.GITHUB_COMMIT }}.img.tar.gz
 
       - name: If Passes tests, upload container image as an artifact
         if: env.TEST_FAIL == 'FALSE'
