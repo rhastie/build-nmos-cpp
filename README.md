@@ -15,13 +15,14 @@ The resulting Docker Container is specifically optimised to operate on a Mellano
 
 Specifically the implementation supports the following specifications:
 
-- [AMWA IS-04 NMOS Discovery and Registration Specification](https://amwa-tv.github.io/nmos-discovery-registration) (supporting v1.0-v1.3)
-- [AMWA IS-05 NMOS Connection Management Specification](https://amwa-tv.github.io/nmos-device-connection-management) (supporting v1.0-v1.1)
-- [AMWA IS-07 NMOS Event & Tally Specification](https://amwa-tv.github.io/nmos-event-tally) (supporting v1.1)
-- [AMWA IS-08 NMOS Audio Channel Mapping Specification](https://amwa-tv.github.io/nmos-audio-channel-mapping) (supporting v1.0)
-- [AMWA IS-09 NMOS System Specification](https://amwa-tv.github.io/nmos-system) (originally defined in JT-NM TR-1001-1:2018 Annex A) (supporting v1.0)
-- [AMWA BCP-002-01 NMOS Grouping Recommendations](https://amwa-tv.github.io/nmos-grouping) - Natural Grouping
-- [AMWA BCP-003-01 NMOS API Security Recommendations](https://amwa-tv.github.io/nmos-api-security) - Securing Communications
+- [AMWA IS-04 NMOS Discovery and Registration Specification](https://specs.amwa.tv/is-04/) (supporting v1.0-v1.3)
+- [AMWA IS-05 NMOS Device Connection Management Specification](https://specs.amwa.tv/is-05/) (supporting v1.0-v1.1)
+- [AMWA IS-07 NMOS Event & Tally Specification](https://specs.amwa.tv/is-07/) (supporting v1.0)
+- [AMWA IS-08 NMOS Audio Channel Mapping Specification](https://specs.amwa.tv/is-08/) (supporting v1.0)
+- [AMWA IS-09 NMOS System Parameters Specification](https://specs.amwa.tv/is-09/) (supporting v1.0)
+- [AMWA BCP-002-01 NMOS Grouping Recommendations - Natural Grouping](https://specs.amwa.tv/bcp-002-01/)
+- [AMWA BCP-003-01 Secure Communication in NMOS Systems](https://specs.amwa.tv/bcp-003-01/)
+- [AMWA BCP-004-01 NMOS Receiver Capabilities](https://specs.amwa.tv/bcp-004-01/)
 
 Additionally it supports the following additional components:
 
@@ -32,7 +33,7 @@ Additionally it supports the following additional components:
 
 The nmos-cpp container includes implementations of the NMOS Node, Registration and Query APIs, and the NMOS Connection API. It also included a NMOS Browser Client/Controller in JavaScript, a MQTT Broker and a DNS-SD API which aren't part of the specifications.
 
-## Container Testing and supported architectures
+## Container Testing, supported architectures and Release Notes
 
 ### JT-NM Tested
 
@@ -112,6 +113,20 @@ The [AMWA NMOS API Testing Tool](https://github.com/AMWA-TV/nmos-testing) is aut
 [IS-09-01-sheet]: https://docs.google.com/spreadsheets/d/1xtxALyCpr5cR4zHwjnW12b8wAOf2uvL0QBLFCPgdE1A/edit#gid=919453974
 [IS-09-02-sheet]: https://docs.google.com/spreadsheets/d/1xtxALyCpr5cR4zHwjnW12b8wAOf2uvL0QBLFCPgdE1A/edit#gid=2135469955
 [MQTT-Broker-link]: https://mosquitto.org/man/mosquitto-8.html
+
+### Release Notes and Versioning
+
+The NVIDIA NMOS docker container even though it is continuously being developed we endeavour to make packages available at various major points. [Docker Hub](https://hub.docker.com/r/rhastie/nmos-cpp/tags?page=1&ordering=last_updated) always provides a list of various tags which relate as follows:
+
+- latest - Will always map to the very latest formally released version of the container.
+- 1.XY-CCCCCCC - Where X is a number, Y is a letter and C is a nmos-cpp commit reference - Mulit-arch, formal release that has been published post testing. These versions will be preserved as long as Docker Hub allows
+- dev-CCCCCCC - Where C is a nmos-cpp commit reference - None multi-arch, dev branch testing - This version should not be relied upon and can be removed without notice.
+- master-CCCCCCC - Where C is a nmos-cpp commit reference - None multi-arch, master branch testing - This version should not be relied upon can be removed without notice.
+- 0.1X - Where X is a letter - Legacy versions of the container before it was formally released.
+
+In addition to Docker Hub we also maintain an aligned set of release pacakges on GitHub - [NVIDIA NMOS Docker container releases](https://github.com/rhastie/build-nmos-cpp/releases)
+
+For the formally released versions of the container you can follow the [Release Notes](https://github.com/rhastie/build-nmos-cpp/blob/master/Release-Notes.md) documentation to see what has changed.
 
 ## How to install and run the container NMOS Registry/Controller
 

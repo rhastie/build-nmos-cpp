@@ -34,12 +34,12 @@ RUN cd /home/ && curl --output - -s -k https://codeload.github.com/sony/nmos-cpp
 ## You should use either Avahi or Apple mDNS - DO NOT use both
 ##
 ## mDNSResponder 878.260.1 Build and install
-RUN cd /home/ && wget --no-check-certificate https://opensource.apple.com/tarballs/mDNSResponder/mDNSResponder-878.260.1.tar.gz && \
-    tar xvf mDNSResponder-878.260.1.tar.gz && rm mDNSResponder-878.260.1.tar.gz && \
-    patch -d mDNSResponder-878.260.1/ -p1 <nmos-cpp/Development/third_party/mDNSResponder/unicast.patch && \
-    patch -d mDNSResponder-878.260.1/ -p1 <nmos-cpp/Development/third_party/mDNSResponder/permit-over-long-service-types.patch && \
-    patch -d mDNSResponder-878.260.1/ -p1 <nmos-cpp/Development/third_party/mDNSResponder/poll-rather-than-select.patch && \
-    cd /home/mDNSResponder-878.260.1/mDNSPosix && make os=linux && make os=linux install
+RUN cd /home/ && curl --output - -s -k https://codeload.github.com/apple-oss-distributions/mDNSResponder/tar.gz/mDNSResponder-878.260.1 | tar zxvf - -C . && \
+    mv ./mDNSResponder-mDNSResponder-878.260.1 ./mDNSResponder && \
+    patch -d mDNSResponder/ -p1 <nmos-cpp/Development/third_party/mDNSResponder/unicast.patch && \
+    patch -d mDNSResponder/ -p1 <nmos-cpp/Development/third_party/mDNSResponder/permit-over-long-service-types.patch && \
+    patch -d mDNSResponder/ -p1 <nmos-cpp/Development/third_party/mDNSResponder/poll-rather-than-select.patch && \
+    cd /home/mDNSResponder/mDNSPosix && make os=linux && make os=linux install
 
 ## Build Sony nmos-cpp from sources
 RUN mkdir /home/nmos-cpp/Development/build && \
@@ -48,6 +48,7 @@ RUN mkdir /home/nmos-cpp/Development/build && \
     -G "Unix Makefiles" \
     -DCMAKE_BUILD_TYPE:STRING="MinSizeRel" \
     -DCMAKE_CONFIGURATION_TYPES:STRING="MinSizeRel" \
+    -DCXXFLAGS:STRING="-Os" \
     -DNMOS_CPP_USE_AVAHI:BOOL="0" \
     /home/nmos-cpp/Development/build .. && \
     if [ -n "$makemt" ]; then echo "Making multi-threaded with $makemt jobs"; make -j$makemt; else echo "Making single-threaded"; make; fi
@@ -100,8 +101,8 @@ COPY --from=stage1-build /home /home
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -y --no-install-recommends \
     openssl make nano curl jq gnupg rdma-core && \
 # Avahi:    dbus avahi-daemon libavahi-compat-libdnssd-dev libnss-mdns AND NOT make \
-    cd /home/mDNSResponder-878.260.1/mDNSPosix && make os=linux install && \
-    cd /home && rm -rf /home/mDNSResponder-878.260.1 /etc/nsswitch.conf.pre-mdns && \
+    cd /home/mDNSResponder/mDNSPosix && make os=linux install && \
+    cd /home && rm -rf /home/mDNSResponder /etc/nsswitch.conf.pre-mdns && \
     curl -sS -k "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x77b7346a59027b33c10cafe35e64e954262c4500" | apt-key add - && \
     echo "deb http://ppa.launchpad.net/mosquitto-dev/mosquitto-ppa/ubuntu focal main" | tee /etc/apt/sources.list.d/mosquitto.list && \
     apt-get update && apt-get install -y --no-install-recommends mosquitto && \
@@ -124,7 +125,7 @@ ARG runnode=FALSE
 ENV RUN_NODE=$runnode
 
 ##Expose correct default ports to allow quick publishing
-EXPOSE 8010 8011 11000 11001 1883
+EXPOSE 8010 8011 11000 11001 1883 5353/udp
 
 WORKDIR /home/
 ENTRYPOINT ["/home/entrypoint.sh"]
