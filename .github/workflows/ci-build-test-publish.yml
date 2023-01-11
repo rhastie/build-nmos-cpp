@@ -143,7 +143,7 @@ jobs:
           pip install -r requirements.txt
 
           # Install SDPoker
-          npm install -g git+https://git@github.com/AMWA-TV/sdpoker.git
+          npm install -g git+https://git@github.com/AMWA-TV/sdpoker.git#bcp-006-01-rbg
 
           pip install -r utilities/run-test-suites/gsheetsImport/requirements.txt
 
