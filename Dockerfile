@@ -22,7 +22,7 @@ RUN python3 -m pip install --upgrade pip setuptools wheel cmake conan
 
 ## Get Certificates and scripts from AMWA-TV/nmos-testing
 RUN cd /home && mkdir certs && git config --global http.sslVerify false && \
-    git clone https://github.com/AMWA-TV/nmos-testing.git && \
+    git clone --branch bcp-006-01 https://github.com/AMWA-TV/nmos-testing.git && \
     mv /home/nmos-testing/test_data/BCP00301/ca/* /home/certs && \
     rm -rf /home/nmos-testing
 
