@@ -131,7 +131,7 @@ jobs:
           root_dir=`pwd`
 
           # Install AMWA test suite.
-          git clone https://github.com/AMWA-TV/nmos-testing.git#bcp-006-01
+          git clone --branch bcp-006-01 https://github.com/AMWA-TV/nmos-testing.git
           cd nmos-testing
 
           # Create output directories
