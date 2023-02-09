@@ -132,7 +132,7 @@ jobs:
 
           # Install AMWA test suite.
           # git clone --branch bcp-006-01 https://github.com/AMWA-TV/nmos-testing.git
-          clone --branch master https://github.com/AMWA-TV/nmos-testing.git
+          git clone --branch master https://github.com/AMWA-TV/nmos-testing.git
           cd nmos-testing
 
           # Create output directories
