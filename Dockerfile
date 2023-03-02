@@ -18,7 +18,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -
     apt-get autoclean -y --no-install-recommends
 
 ## Install latest versions of CMake and Conan using pip3 package installer
-RUN python3 -m pip install --upgrade pip setuptools wheel cmake conan
+RUN python3 -m pip install --upgrade pip setuptools wheel cmake conan==1.58.0
 
 ## Get Certificates and scripts from AMWA-TV/nmos-testing
 RUN cd /home && mkdir certs && git config --global http.sslVerify false && \
