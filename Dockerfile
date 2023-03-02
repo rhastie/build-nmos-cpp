@@ -20,9 +20,6 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -
 ## Install latest versions of CMake and Conan using pip3 package installer
 RUN python3 -m pip install --upgrade pip setuptools wheel cmake conan
 
-## Create the required profile for conan
-RUN conan profile detect
-
 ## Get Certificates and scripts from AMWA-TV/nmos-testing
 RUN cd /home && mkdir certs && git config --global http.sslVerify false && \
     git clone https://github.com/AMWA-TV/nmos-testing.git && \
