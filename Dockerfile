@@ -27,9 +27,11 @@ RUN cd /home && mkdir certs && git config --global http.sslVerify false && \
     rm -rf /home/nmos-testing
 
 ## Get source for Sony nmos-cpp/
-ENV NMOS_CPP_VERSION=287048d5121aca30e01125d89dbea463787e19a5
-RUN cd /home/ && curl --output - -s -k https://codeload.github.com/sony/nmos-cpp/tar.gz/$NMOS_CPP_VERSION | tar zxvf - -C . && \
-    mv ./nmos-cpp-${NMOS_CPP_VERSION} ./nmos-cpp
+
+# ENV NMOS_CPP_VERSION=287048d5121aca30e01125d89dbea463787e19a5
+# RUN cd /home/ && curl --output - -s -k https://codeload.github.com/sony/nmos-cpp/tar.gz/$NMOS_CPP_VERSION | tar zxvf - -C . && \
+#     mv ./nmos-cpp-${NMOS_CPP_VERSION} ./nmos-cpp
+RUN cd /home/ && git clone https://github.com/rbgodwin-nt/nmos-cpp.git
 
 ## You should use either Avahi or Apple mDNS - DO NOT use both
 ##
