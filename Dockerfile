@@ -1,4 +1,4 @@
-FROM ubuntu:focal as stage1-build
+FROM ubuntu:jammy as stage1-build
 MAINTAINER rhastie@nvidia.com
 LABEL maintainer="rhastie@nvidia.com"
 
@@ -95,7 +95,7 @@ RUN cd /home/nmos-cpp/Development/build && \
     cd /home && rm -rf .git nmos-cpp nmos-js
 
 ## Re-build container for optimised runtime environment using clean Ubuntu Bionic release
-FROM ubuntu:focal
+FROM ubuntu:jammy
 
 ##Copy required files from build container
 COPY --from=stage1-build /home /home
@@ -107,7 +107,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -
     cd /home/mDNSResponder/mDNSPosix && make os=linux install && \
     cd /home && rm -rf /home/mDNSResponder /etc/nsswitch.conf.pre-mdns && \
     curl -sS -k "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x77b7346a59027b33c10cafe35e64e954262c4500" | apt-key add - && \
-    echo "deb http://ppa.launchpad.net/mosquitto-dev/mosquitto-ppa/ubuntu focal main" | tee /etc/apt/sources.list.d/mosquitto.list && \
+    echo "deb http://ppa.launchpad.net/mosquitto-dev/mosquitto-ppa/ubuntu jammy main" | tee /etc/apt/sources.list.d/mosquitto.list && \
     apt-get update && apt-get install -y --no-install-recommends mosquitto && \
     apt-get remove --purge -y make gnupg && \
     apt-get autoremove -y && \
