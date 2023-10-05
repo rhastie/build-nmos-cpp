@@ -1,0 +1,10 @@
+*					text=auto
+*.txt				text
+*.sh				text eol=lf
+*.json				text eol=lf
+*.yml				text eol=lf
+Makefile			text eol=lf
+Dockerfile  		text eol=lf
+container-config	text eol=lf
+.github/*     		text eol=lf
+hooks/build 		text eol=lf
