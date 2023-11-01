@@ -28,7 +28,7 @@ RUN cd /home && mkdir certs && git config --global http.sslVerify false && \
 
 ## Get source for Sony nmos-cpp
 ## Commit 17f1b8b is newer than Conan package nmos-cpp/cci.20221203
-ENV NMOS_CPP_VERSION=b5c8d2eef1d3de9e1621e1cb97dadf902d98212c
+ENV NMOS_CPP_VERSION=a584f92a2bd80429b52e24b0fac8b091eb4db9fc
 RUN cd /home/ && curl --output - -s -k https://codeload.github.com/sony/nmos-cpp/tar.gz/$NMOS_CPP_VERSION | tar zxvf - -C . && \
     mv ./nmos-cpp-${NMOS_CPP_VERSION} ./nmos-cpp
 
