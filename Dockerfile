@@ -40,7 +40,7 @@ RUN cd /home/ && curl --output - -s -k https://codeload.github.com/apple-oss-dis
     patch -d mDNSResponder/ -p1 <nmos-cpp/Development/third_party/mDNSResponder/unicast.patch && \
     patch -d mDNSResponder/ -p1 <nmos-cpp/Development/third_party/mDNSResponder/permit-over-long-service-types.patch && \
     patch -d mDNSResponder/ -p1 <nmos-cpp/Development/third_party/mDNSResponder/poll-rather-than-select.patch && \
-    cd /home/mDNSResponder/mDNSPosix && make os=linux && make os=linux install
+    cd /home/mDNSResponder/mDNSPosix && HAVE_IPV6=0 make os=linux && make os=linux install
 
 ## Build Sony nmos-cpp from sources
 RUN mkdir /home/nmos-cpp/Development/build && \
