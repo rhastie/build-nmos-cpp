@@ -17,8 +17,8 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -
     apt-get clean -y --no-install-recommends && \
     apt-get autoclean -y --no-install-recommends
 
-## Install latest versions of CMake and Conan using pip3 package installer
-RUN python3 -m pip install --upgrade pip setuptools wheel cmake conan~=1.47
+## Install latest versions of CMake and Conan using pip3 package installer. Pin v1.x for Conan
+RUN python3 -m pip install --upgrade pip setuptools wheel cmake conan~=1.62
 
 ## Get Certificates and scripts from AMWA-TV/nmos-testing
 RUN cd /home && mkdir certs && git config --global http.sslVerify false && \
@@ -27,8 +27,7 @@ RUN cd /home && mkdir certs && git config --global http.sslVerify false && \
     rm -rf /home/nmos-testing
 
 ## Get source for Sony nmos-cpp
-## Commit 17f1b8b is newer than Conan package nmos-cpp/cci.20221203
-ENV NMOS_CPP_VERSION=a584f92a2bd80429b52e24b0fac8b091eb4db9fc
+ENV NMOS_CPP_VERSION=85d5443c0e41ba45d44a7ba9da66e8deceaf9955
 RUN cd /home/ && curl --output - -s -k https://codeload.github.com/sony/nmos-cpp/tar.gz/$NMOS_CPP_VERSION | tar zxvf - -C . && \
     mv ./nmos-cpp-${NMOS_CPP_VERSION} ./nmos-cpp
 
@@ -71,7 +70,7 @@ RUN cd /home/ && mkdir example-conf && mkdir admin
 ADD example-conf /home/example-conf
 
 ## Get and build source for Sony nmos-js
-ENV NMOS_JS_VERSION=41fb6819231ff9c4ffc74a6bd5b285e21e964a21
+ENV NMOS_JS_VERSION=5896ef98dfa236eb76c2521f33b699a14450d85d
 RUN cd /home/ && curl --output - -s -k https://codeload.github.com/sony/nmos-js/tar.gz/$NMOS_JS_VERSION | tar zxvf - -C . && \
     mv ./nmos-js-${NMOS_JS_VERSION} ./nmos-js
 
@@ -94,7 +93,7 @@ RUN cd /home/nmos-cpp/Development/build && \
     cp nmos-cpp-node nmos-cpp-registry /home && \
     cd /home && rm -rf .git nmos-cpp nmos-js
 
-## Re-build container for optimised runtime environment using clean Ubuntu Bionic release
+## Re-build container for optimised runtime environment using clean Ubuntu Jammy release
 FROM ubuntu:jammy
 
 ##Copy required files from build container
