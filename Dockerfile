@@ -1,4 +1,6 @@
-FROM ubuntu:jammy as stage1-build
+ARG BASE_IMAGE=ubuntu:jammy
+
+FROM ${BASE_IMAGE} as stage1-build
 MAINTAINER rhastie@nvidia.com
 LABEL maintainer="rhastie@nvidia.com"
 
@@ -93,8 +95,8 @@ RUN cd /home/nmos-cpp/Development/build && \
     cp nmos-cpp-node nmos-cpp-registry /home && \
     cd /home && rm -rf .git nmos-cpp nmos-js
 
-## Re-build container for optimised runtime environment using clean Ubuntu Jammy release
-FROM ubuntu:jammy
+## Re-build container for optimised runtime environment using clean base image
+FROM ${BASE_IMAGE}
 
 ##Copy required files from build container
 COPY --from=stage1-build /home /home
