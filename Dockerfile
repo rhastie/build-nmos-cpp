@@ -19,8 +19,8 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -
     apt-get clean -y --no-install-recommends && \
     apt-get autoclean -y --no-install-recommends
 
-## Install latest versions of CMake and Conan using pip3 package installer. Pin v1.x for Conan
-RUN python3 -m pip install --upgrade pip setuptools wheel cmake conan~=1.62
+## Install latest versions of CMake and Conan using pip3 package installer
+RUN python3 -m pip install --upgrade pip setuptools wheel cmake conan
 
 ## Get Certificates and scripts from AMWA-TV/nmos-testing
 RUN cd /home && mkdir certs && git config --global http.sslVerify false && \
@@ -29,7 +29,8 @@ RUN cd /home && mkdir certs && git config --global http.sslVerify false && \
     rm -rf /home/nmos-testing
 
 ## Get source for Sony nmos-cpp
-ENV NMOS_CPP_VERSION=85d5443c0e41ba45d44a7ba9da66e8deceaf9955
+## Commit 27dff31 corresponds to Conan package nmos-cpp/cci.20240223
+ENV NMOS_CPP_VERSION=27dff31919e06a132651291648293ff7b6b38b38
 RUN cd /home/ && curl --output - -s -k https://codeload.github.com/sony/nmos-cpp/tar.gz/$NMOS_CPP_VERSION | tar zxvf - -C . && \
     mv ./nmos-cpp-${NMOS_CPP_VERSION} ./nmos-cpp
 
@@ -48,8 +49,8 @@ RUN mkdir /home/nmos-cpp/Development/build && \
     cd /home/nmos-cpp/Development/build && \
     cmake \
     -G "Unix Makefiles" \
+    -DCMAKE_PROJECT_TOP_LEVEL_INCLUDES:STRING="third_party/cmake/conan_provider.cmake" \
     -DCMAKE_BUILD_TYPE:STRING="MinSizeRel" \
-    -DCMAKE_CONFIGURATION_TYPES:STRING="MinSizeRel" \
     -DCXXFLAGS:STRING="-Os" \
     -DNMOS_CPP_USE_AVAHI:BOOL="0" \
     /home/nmos-cpp/Development/build .. && \

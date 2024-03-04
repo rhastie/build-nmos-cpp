@@ -20,9 +20,12 @@ Specifically the implementation supports the following specifications:
 - [AMWA IS-07 NMOS Event & Tally Specification](https://specs.amwa.tv/is-07/) (supporting v1.0)
 - [AMWA IS-08 NMOS Audio Channel Mapping Specification](https://specs.amwa.tv/is-08/) (supporting v1.0)
 - [AMWA IS-09 NMOS System Parameters Specification](https://specs.amwa.tv/is-09/) (supporting v1.0)
+- [AMWA IS-10 NMOS Authorization Specification](https://specs.amwa.tv/is-10/) (supporting v1.0)
 - [AMWA BCP-002-01 NMOS Grouping Recommendations - Natural Grouping](https://specs.amwa.tv/bcp-002-01/)
+- [AMWA BCP-002-02 NMOS Asset Distinguishing Information](https://specs.amwa.tv/bcp-002-02/)
 - [AMWA BCP-003-01 Secure Communication in NMOS Systems](https://specs.amwa.tv/bcp-003-01/)
 - [AMWA BCP-004-01 NMOS Receiver Capabilities](https://specs.amwa.tv/bcp-004-01/)
+- [AMWA BCP-006-01 NMOS With JPEG XS](https://specs.amwa.tv/bcp-006-01/)
 
 Additionally it supports the following additional components:
 
@@ -68,9 +71,9 @@ Please see wider [Sony CI Testing](https://github.com/sony/nmos-cpp/blob/master/
 
 The following configuration, defined by the [ci-build-test-publish](.github/workflows/ci-build-test-publish.yml) job, is built and unit tested automatically via continuous integration. If the tests complete successfully the container is published directly to Docker Hub and also saved as an artifact against the GitHub Action Job. Additional configurations may be added in the future.
 
-| Platform | Version                  | Configuration Options                  |
-|----------|--------------------------|----------------------------------------|
-| Linux    | Ubuntu 18.04 (GCC 7.5.0) | Avahi                                  |
+| Platform | Version                   | Configuration Options                  |
+|----------|---------------------------|----------------------------------------|
+| Linux    | Ubuntu 22.04 (GCC 11.4.0) | Avahi                                  |
 
 The [AMWA NMOS API Testing Tool](https://github.com/AMWA-TV/nmos-testing) is automatically run against the built **NMOS container** operating in both "nmos-node" and "nmos-registry" configurations.
 
@@ -270,4 +273,4 @@ make build
 ```sh
 make buildnode
 ```
-Please note the container will be built with a “-node” suffix applied to remove any confusion.
+Please note the container will be built with a "-node" suffix applied to remove any confusion.
