@@ -1,7 +1,6 @@
 ARG BASE_IMAGE=ubuntu:jammy
 
-FROM ${BASE_IMAGE} as stage1-build
-MAINTAINER rhastie@nvidia.com
+FROM ${BASE_IMAGE} AS stage1-build
 LABEL maintainer="rhastie@nvidia.com"
 
 ARG makemt
@@ -13,7 +12,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -
     openssl libssl-dev git wget gnupg curl ca-certificates nano \
     python3 python3-pip python3-setuptools rdma-core && \
 # Avahi:    dbus avahi-daemon libavahi-compat-libdnssd-dev libnss-mdns AND NOT make \
-    curl -sL https://deb.nodesource.com/setup_16.x | bash - && \
+    curl -sL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get update && apt-get install -y --no-install-recommends nodejs && corepack enable && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean -y --no-install-recommends && \
@@ -29,8 +28,8 @@ RUN cd /home && mkdir certs && git config --global http.sslVerify false && \
     rm -rf /home/nmos-testing
 
 ## Get source for Sony nmos-cpp
-## Commit 27dff31 corresponds to Conan package nmos-cpp/cci.20240223
-ENV NMOS_CPP_VERSION=27dff31919e06a132651291648293ff7b6b38b38
+## Commit 079620d corresponds to Conan package nmos-cpp/cci.20260602
+ENV NMOS_CPP_VERSION=079620d88756aa138ede92d3f52a0102370307fe
 RUN cd /home/ && curl --output - -s -k https://codeload.github.com/sony/nmos-cpp/tar.gz/$NMOS_CPP_VERSION | tar zxvf - -C . && \
     mv ./nmos-cpp-${NMOS_CPP_VERSION} ./nmos-cpp
 
@@ -73,7 +72,7 @@ RUN cd /home/ && mkdir example-conf && mkdir admin
 ADD example-conf /home/example-conf
 
 ## Get and build source for Sony nmos-js
-ENV NMOS_JS_VERSION=5896ef98dfa236eb76c2521f33b699a14450d85d
+ENV NMOS_JS_VERSION=331ae7614e1003c4f1a64aeac405eb628190e9d9
 RUN cd /home/ && curl --output - -s -k https://codeload.github.com/sony/nmos-js/tar.gz/$NMOS_JS_VERSION | tar zxvf - -C . && \
     mv ./nmos-js-${NMOS_JS_VERSION} ./nmos-js
 
