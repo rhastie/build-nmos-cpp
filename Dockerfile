@@ -1,4 +1,5 @@
 ARG BASE_IMAGE=ubuntu:noble
+## Commit 079620d corresponds to Conan package nmos-cpp/cci.20260602
 ARG NMOS_CPP_VERSION=079620d88756aa138ede92d3f52a0102370307fe
 ARG NMOS_JS_VERSION=331ae7614e1003c4f1a64aeac405eb628190e9d9
 
@@ -33,7 +34,6 @@ RUN cd /home && mkdir certs && git config --global http.sslVerify false && \
     rm -rf /home/nmos-testing
 
 ## Get source for Sony nmos-cpp
-## Commit 079620d corresponds to Conan package nmos-cpp/cci.20260602
 RUN cd /home/ && curl --output - -s -k https://codeload.github.com/sony/nmos-cpp/tar.gz/${NMOS_CPP_VERSION} | tar zxvf - -C . && \
     mv ./nmos-cpp-${NMOS_CPP_VERSION} ./nmos-cpp
 
