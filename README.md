@@ -49,11 +49,10 @@ In addition, the container has been successfully tested in AMWA Networked Media 
 
 ### Tested Platforms and supported CPU Architectures
 
-The Dockerfile in this repository is designed so that if needed it can be run under the Docker Experimental BuildX CLI feature set. The container is published for the follow CPU Architectures:
+The Dockerfile in this repository is designed so that if needed it can be run under the Docker Experimental BuildX CLI feature set. Newer container images are published for the follow CPU Architectures:
 
 - Intel and AMD x86_86 64-bit architectures
 - ARMv8 AArch64 (64-bit ARM architecture)
-- ARMv7 AArch32 (32-bit ARM architecture)
 
 The container has been tested on the following platforms for compatibility:
 
@@ -72,9 +71,9 @@ Please see wider [Sony CI Testing](https://github.com/sony/nmos-cpp/blob/master/
 
 The following configuration, defined by the [ci-build-test-publish](.github/workflows/ci-build-test-publish.yml) job, is built and unit tested automatically via continuous integration. If the tests complete successfully the container is published directly to Docker Hub and also saved as an artifact against the GitHub Action Job. Additional configurations may be added in the future.
 
-| Platform | Version                   | Configuration Options                  |
-|----------|---------------------------|----------------------------------------|
-| Linux    | Ubuntu 22.04 (GCC 11.4.0) | Avahi                                  |
+| Base Container            | nmos-cpp Version                         | Test Runner          |
+|---------------------------|------------------------------------------|----------------------|
+| Ubuntu 24.04 (GCC 13.3.0) | `079620d` / cci.20260602 (mDNSResponder) | Ubuntu 24.04 (Avahi) |
 
 The [AMWA NMOS API Testing Tool](https://github.com/AMWA-TV/nmos-testing) is automatically run against the built **NMOS container** operating in both "nmos-node" and "nmos-registry" configurations.
 
