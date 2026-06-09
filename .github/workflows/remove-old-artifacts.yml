@@ -12,7 +12,7 @@ jobs:
 
     steps:
     - name: Remove old artifacts
-      uses: c-hive/gha-remove-artifacts@v1.4.0
+      uses: c-hive/gha-remove-artifacts@ca9712b3e7e2028a11d9918944e30664a6ed5e82 # node24; v1.4.0 is still node20
       with:
         age: '1 month'
         # Optional inputs

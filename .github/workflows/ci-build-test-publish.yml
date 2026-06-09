@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set environment variables
         shell: bash
@@ -100,7 +100,7 @@ jobs:
           sudo systemctl restart avahi-daemon
 
       - name: Install python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.11'
 
@@ -337,19 +337,19 @@ jobs:
 
       - name: If Passes tests, upload container image as an artifact
         if: env.TEST_FAIL == 'FALSE'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ env.BUILD_NAME }}_container 
           path: ${{ runner.workspace }}/container-image/nmos-cpp_${{ env.GITHUB_BRANCH }}-${{ env.GITHUB_COMMIT }}.img.tar.gz
 
       - name: Upload badges as artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ env.BUILD_NAME }}_badges
           path: ${{ runner.workspace }}/nmos-testing/badges
     
       - name: Upload results as artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ env.BUILD_NAME }}_results
           path: ${{ runner.workspace }}/nmos-testing/results
@@ -360,7 +360,7 @@ jobs:
     needs: docker-buildx-test-publish
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: set environment variables
         shell: bash
@@ -370,7 +370,7 @@ jobs:
           echo "GITHUB_WORKSPACE=${{ github.workspace }}" >> $GITHUB_ENV
           echo "RUNNER_WORKSPACE=${{ runner.workspace }}" >> $GITHUB_ENV
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           path: ${{ runner.workspace }}/artifacts
 
