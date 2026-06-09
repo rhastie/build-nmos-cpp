@@ -24,7 +24,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get install -
 ## Install CMake and Conan in a venv (Noble blocks system-wide pip — PEP 668)
 RUN python3 -m venv /opt/venv
 ENV PATH=/opt/venv/bin:$PATH
-RUN pip install --no-cache-dir "cmake>=3.24" "conan>=2.20,<3"
+RUN pip install --no-cache-dir "cmake~=3.31" "conan~=2.29"
 
 ## Get Certificates and scripts from AMWA-TV/nmos-testing
 RUN cd /home && mkdir certs && git config --global http.sslVerify false && \
