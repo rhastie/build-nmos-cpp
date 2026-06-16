@@ -11,6 +11,7 @@ LABEL maintainer="rhastie@nvidia.com"
 
 ARG makemt
 ARG NMOS_CPP_VERSION
+ARG CMAKE_BUILD_TYPE=Release
 
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
 
@@ -48,12 +49,12 @@ RUN cd /home/ && curl --output - -s -k https://codeload.github.com/apple-oss-dis
     cd /home/mDNSResponder/mDNSPosix && HAVE_IPV6=0 make os=linux && make os=linux install
 
 ## Build Sony nmos-cpp from sources
+ARG CMAKE_BUILD_TYPE
 RUN conan profile detect --force \
     && cmake -S /home/nmos-cpp/Development -B /home/nmos-cpp/Development/build \
         -G "Unix Makefiles" \
         -DCMAKE_PROJECT_TOP_LEVEL_INCLUDES=third_party/cmake/conan_provider.cmake \
-        -DCMAKE_BUILD_TYPE=MinSizeRel \
-        -DCXXFLAGS=-Os \
+        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} \
         -DNMOS_CPP_USE_AVAHI=OFF \
         -DNMOS_CPP_BUILD_EXAMPLES=ON \
         -DNMOS_CPP_BUILD_TESTS=OFF \
