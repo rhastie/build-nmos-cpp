@@ -5,6 +5,5 @@
 "label": "nvidia-container",
 "http_port": 8010,
 "query_ws_port": 8011,
-"registration_expiry_interval": 12,
-"domain": "local."
+"registration_expiry_interval": 12
 }
