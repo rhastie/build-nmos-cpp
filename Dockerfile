@@ -2,7 +2,7 @@ ARG BASE_IMAGE=ubuntu:noble
 ## Commit 079620d corresponds to Conan package nmos-cpp/cci.20260602
 ARG NMOS_CPP_VERSION=079620d88756aa138ede92d3f52a0102370307fe
 ## IS-12 browser integration (sony/nmos-js#157) merged to master as of this commit
-ARG NMOS_JS_VERSION=ebbfd89dd2181124e48218f90a2d1a1ddab1f4b8
+ARG NMOS_JS_VERSION=17eacdaad298359cc10353944ab4f84413fcb190
 
 ############################################################
 # Stage 1 — build nmos-cpp, certs, and assemble /home
