@@ -46,3 +46,8 @@ diff -ruN nmos-js/Development/src/config.json nmos-js.new/Development/src/config
              "contrastText": "#fff"
          }
      },
+@@ -20,3 +20,3 @@
+     "IS-12 Browser": {
+-        "value": ""
++        "value": "/admin/is12-client"
+     },

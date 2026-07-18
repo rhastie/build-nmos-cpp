@@ -1,7 +1,8 @@
 ARG BASE_IMAGE=ubuntu:noble
 ## Commit 079620d corresponds to Conan package nmos-cpp/cci.20260602
 ARG NMOS_CPP_VERSION=079620d88756aa138ede92d3f52a0102370307fe
-ARG NMOS_JS_VERSION=331ae7614e1003c4f1a64aeac405eb628190e9d9
+## IS-12 browser integration (sony/nmos-js#157) merged to master as of this commit
+ARG NMOS_JS_VERSION=17eacdaad298359cc10353944ab4f84413fcb190
 
 ############################################################
 # Stage 1 — build nmos-cpp, certs, and assemble /home
@@ -11,6 +12,7 @@ LABEL maintainer="rhastie@nvidia.com"
 
 ARG makemt
 ARG NMOS_CPP_VERSION
+ARG CMAKE_BUILD_TYPE=Release
 
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
 
@@ -48,12 +50,12 @@ RUN cd /home/ && curl --output - -s -k https://codeload.github.com/apple-oss-dis
     cd /home/mDNSResponder/mDNSPosix && HAVE_IPV6=0 make os=linux && make os=linux install
 
 ## Build Sony nmos-cpp from sources
+ARG CMAKE_BUILD_TYPE
 RUN conan profile detect --force \
     && cmake -S /home/nmos-cpp/Development -B /home/nmos-cpp/Development/build \
         -G "Unix Makefiles" \
         -DCMAKE_PROJECT_TOP_LEVEL_INCLUDES=third_party/cmake/conan_provider.cmake \
-        -DCMAKE_BUILD_TYPE=MinSizeRel \
-        -DCXXFLAGS=-Os \
+        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} \
         -DNMOS_CPP_USE_AVAHI=OFF \
         -DNMOS_CPP_BUILD_EXAMPLES=ON \
         -DNMOS_CPP_BUILD_TESTS=OFF \
@@ -108,12 +110,17 @@ RUN mv /home/nmos-js/Development/src/assets/nmos-js.patch /home/nmos-js.patch \
     && rm /home/nmos-js/Development/src/assets/sea-lion.png \
     && rm /home/nmos-js.patch
 
-## Build and install Sony nmos-js
+## Build and install nmos-js and co-located IS-12 browser under /admin/
 WORKDIR /home/nmos-js/Development
 RUN corepack enable \
     && yarn install --network-timeout 1000000 \
     && yarn build \
     && mkdir -p /admin && cp -rf build/* /admin/
+
+WORKDIR /home/nmos-js/is12-client
+RUN yarn install --network-timeout 1000000 \
+    && PUBLIC_URL=/admin/is12-client yarn build \
+    && mkdir -p /admin/is12-client && cp -rf build/* /admin/is12-client/
 
 ############################################################
 # Stage 3 — slim runtime image
