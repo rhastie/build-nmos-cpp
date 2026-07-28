@@ -73,7 +73,7 @@ The following configuration, defined by the [ci-build-test-publish](.github/work
 
 | Base Container            | nmos-cpp Version                         | Test Runner          |
 |---------------------------|------------------------------------------|----------------------|
-| Ubuntu 24.04 (GCC 13.3.0) | `079620d` / cci.20260602 (mDNSResponder) | Ubuntu 24.04 (Avahi) |
+| Ubuntu 24.04 (GCC 13.3.0) | `a19e364` / cci.20260812 (mDNSResponder) | Ubuntu 24.04 (Avahi) |
 
 The [AMWA NMOS API Testing Tool](https://github.com/AMWA-TV/nmos-testing) is automatically run against the built **NMOS container** operating in both "nmos-node" and "nmos-registry" configurations.
 
