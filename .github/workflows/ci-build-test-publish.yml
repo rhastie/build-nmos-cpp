@@ -293,6 +293,12 @@ jobs:
           sudo ip address add 172.17.0.1/16 broadcast 172.17.255.255 dev docker0 || echo "Docker IP Address add failed"
           ip address
           
+      # Disable ASLR to avoid intermittent collect2/gcc segfaults when the
+      # multi-arch publish cross-builds linux/arm64 under QEMU (tonistiigi/binfmt#215).
+      - name: Disable ASLR for QEMU cross-build
+        if: env.TEST_FAIL == 'FALSE' && (env.GITHUB_BRANCH == 'master' || env.GITHUB_BRANCH == 'dev')
+        run: sudo sysctl -w kernel.randomize_va_space=0
+
       - name: If Passes tests, Docker Buildx and publish x86 image to Docker Hub
         if: env.TEST_FAIL == 'FALSE' && (env.GITHUB_BRANCH == 'master' || env.GITHUB_BRANCH == 'dev')
         uses: ilteoood/docker_buildx@master
