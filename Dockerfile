@@ -1,8 +1,8 @@
 ARG BASE_IMAGE=ubuntu:noble
 ## Commit a19e364 corresponds to Conan package nmos-cpp/cci.20260812
 ARG NMOS_CPP_VERSION=a19e3648ecfd620715b0f0fe3f184c6b7f26a996
-## Tip of master including Connection API Bridge client + routing fixes (sony/nmos-js#171)
-ARG NMOS_JS_VERSION=7cb808218d059fb59b11b0be579437d55756d0e6
+## Tip of master including NMOS Bridge, IS-08 channel mapping edit, and NCP WebSockets
+ARG NMOS_JS_VERSION=182b3722cc9de04b2cb5ba60d1a09d5cf733bf30
 
 ############################################################
 # Stage 1 — build nmos-cpp, certs, and assemble /home
