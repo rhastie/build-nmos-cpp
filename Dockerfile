@@ -5,6 +5,27 @@ ARG NMOS_CPP_VERSION=b6c83670ba6b37c55b8e4f0b440268016e1b5941
 ARG NMOS_JS_VERSION=0c361b69beedbbb783bd57cb935588f1e311adfd
 
 ############################################################
+# Optional NMOS Bridge adapter target, independent of the nmos-cpp and nmos-js browser UI builds.
+# Placed first so that the legacy builder does not build the other stages for it.
+############################################################
+FROM node:22-alpine AS bridge-source
+ARG NMOS_JS_VERSION
+RUN apk add --no-cache curl ca-certificates
+WORKDIR /src
+RUN curl -fsSL https://codeload.github.com/sony/nmos-js/tar.gz/${NMOS_JS_VERSION} \
+    | tar -xz --strip-components=1
+
+FROM node:22-alpine AS bridge-adapter
+ARG NMOS_JS_VERSION
+LABEL org.opencontainers.image.source="https://github.com/sony/nmos-js" \
+      org.opencontainers.image.revision="${NMOS_JS_VERSION}" \
+      org.opencontainers.image.licenses="Apache-2.0"
+WORKDIR /opt/nmos-bridge
+COPY --from=bridge-source /src/nmos-bridge/adapter/index.js /src/nmos-bridge/adapter/package.json ./
+COPY --from=bridge-source /src/LICENSE /src/NOTICE /usr/share/licenses/nmos-bridge/
+CMD ["node", "/opt/nmos-bridge/index.js"]
+
+############################################################
 # Stage 1 — build nmos-cpp, certs, and assemble /home
 ############################################################
 FROM ${BASE_IMAGE} AS stage1-build
@@ -123,7 +144,7 @@ RUN yarn install --network-timeout 1000000 \
     && mkdir -p /admin/is12-client && cp -rf build/* /admin/is12-client/
 
 ############################################################
-# Stage 3 — slim runtime image
+# Stage 3 — slim runtime image (keep last for the default registry/node build)
 ############################################################
 ## Re-build container for optimised runtime environment using clean base image
 FROM ${BASE_IMAGE}
@@ -155,6 +176,13 @@ RUN chmod +x /home/entrypoint.sh
 ##Set default config variable to run registry (FALSE) or node (TRUE)
 ARG runnode=FALSE
 ENV RUN_NODE=$runnode
+
+##Empty version overrides the version label inherited from the Ubuntu base image
+ARG NMOS_CPP_VERSION
+LABEL org.opencontainers.image.source="https://github.com/sony/nmos-cpp" \
+      org.opencontainers.image.revision="${NMOS_CPP_VERSION}" \
+      org.opencontainers.image.version="" \
+      org.opencontainers.image.licenses="Apache-2.0"
 
 ##Expose correct default ports to allow quick publishing
 EXPOSE 8010 8011 11000 11001 1883 5353/udp
