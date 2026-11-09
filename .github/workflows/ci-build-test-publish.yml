@@ -14,8 +14,45 @@ env:
   SECRET_RESULTS_SHEET_ID: ${{ secrets.RESULTS_SHEET_ID }}
 
 jobs:
+  bridge-adapter-build-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v6
+
+      # Only the small source download stage runs under emulation.
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Docker Buildx multi-arch NMOS Bridge adapter image, and on dev or master publish it to Docker Hub
+        shell: bash
+        env:
+          DOCKER_IMAGE_NAME: ${{ secrets.Docker_Image_Name || 'rhastie/nmos-cpp' }}
+          DOCKERHUB_USERNAME: ${{ secrets.DockerHub_User }}
+          DOCKERHUB_PASSWORD: ${{ secrets.DockerHub_Password }}
+          PUSH_LATEST: ${{ secrets.PUSH_LATEST }}
+        run: |
+          args=()
+          if [[ "$GITHUB_REF_NAME" == "master" || "$GITHUB_REF_NAME" == "dev" ]] && [[ "${{ github.event_name }}" != "pull_request" ]]; then
+            printf '%s' "$DOCKERHUB_PASSWORD" | docker login --username "$DOCKERHUB_USERNAME" --password-stdin
+            # Publish in the same Docker Hub namespace as the registry image
+            image="${DOCKER_IMAGE_NAME%/*}/nmos-bridge-adapter"
+            nmos_js_commit=$(sed -n 's/.*NMOS_JS_VERSION=\(.......\).*/\1/p' Dockerfile)
+            args+=(--push --tag "$image:$GITHUB_REF_NAME-$nmos_js_commit")
+            if [[ "$PUSH_LATEST" == "TRUE" && "$GITHUB_REF_NAME" == "master" ]]; then
+              args+=(--tag "$image:latest")
+            fi
+          fi
+          docker buildx build --target bridge-adapter --platform linux/amd64,linux/arm64 "${args[@]}" .
+
   docker-buildx-test-publish:
     runs-on: ubuntu-latest
+    outputs:
+      amd64-digest: ${{ steps.publish-amd64.outputs.digest }}
+      tags: ${{ steps.publish-amd64.outputs.tags }}
     steps:
       - name: Checkout branch
         uses: actions/checkout@v6
@@ -42,15 +79,9 @@ jobs:
             echo "DOCKER_IMAGE_NAME=rhastie/nmos-cpp" >> $GITHUB_ENV
           fi
 
-      - name: Set platforms and tags
+      - name: Set tags
         shell: bash
         run: |
-          if [[ "${{ secrets.BUILD_PLATFORMS }}" ]] && [[ "${{ env.GITHUB_BRANCH }}" == "master" ]]; then 
-            echo "BUILD_PLATFORMS=${{ secrets.BUILD_PLATFORMS }}" >> $GITHUB_ENV
-          else
-            echo "BUILD_PLATFORMS=linux/amd64" >> $GITHUB_ENV
-          fi
-
           if [[ "${{ secrets.PUSH_LATEST }}" == "TRUE" ]] && [[ "${{ env.GITHUB_BRANCH }}" == "master" ]]; then
             echo "BUILD_TAGS=${{ env.GITHUB_BRANCH }}-${{ env.GITHUB_COMMIT }},latest" >> $GITHUB_ENV
           else
@@ -293,25 +324,23 @@ jobs:
           sudo ip address add 172.17.0.1/16 broadcast 172.17.255.255 dev docker0 || echo "Docker IP Address add failed"
           ip address
           
-      # Disable ASLR to avoid intermittent collect2/gcc segfaults when the
-      # multi-arch publish cross-builds linux/arm64 under QEMU (tonistiigi/binfmt#215).
-      - name: Disable ASLR for QEMU cross-build
+      # Uses the builder and cache from the load step above.
+      # The docker-buildx-arm64-publish job publishes the tags, once the arm64 image is built
+      - name: If Passes tests, Docker Buildx and publish x86 image to Docker Hub by digest
+        id: publish-amd64
         if: env.TEST_FAIL == 'FALSE' && (env.GITHUB_BRANCH == 'master' || env.GITHUB_BRANCH == 'dev')
-        run: sudo sysctl -w kernel.randomize_va_space=0
-
-      - name: If Passes tests, Docker Buildx and publish x86 image to Docker Hub
-        if: env.TEST_FAIL == 'FALSE' && (env.GITHUB_BRANCH == 'master' || env.GITHUB_BRANCH == 'dev')
-        uses: ilteoood/docker_buildx@master
-        with:
-          dockerfile: Dockerfile
-          publish: true
-          load: false
-          imageName: ${{ env.DOCKER_IMAGE_NAME }}
-          tag: ${{ env.BUILD_TAGS }}
-          buildArg: makemt=3
-          platform: ${{ env.BUILD_PLATFORMS }}
-          dockerUser: ${{ secrets.DockerHub_User }}
-          dockerPassword: ${{ secrets.DockerHub_Password }}
+        shell: bash
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DockerHub_User }}
+          DOCKERHUB_PASSWORD: ${{ secrets.DockerHub_Password }}
+        run: |
+          printf '%s' "$DOCKERHUB_PASSWORD" | docker login --username "$DOCKERHUB_USERNAME" --password-stdin
+          docker buildx build --platform linux/amd64 --build-arg makemt=3 \
+            --output "type=image,name=$DOCKER_IMAGE_NAME,push-by-digest=true,name-canonical=true,push=true" \
+            --metadata-file "$RUNNER_TEMP/metadata.json" .
+          digest=$(jq -er '."containerimage.digest"' "$RUNNER_TEMP/metadata.json")
+          echo "digest=$digest" >> $GITHUB_OUTPUT
+          echo "tags=$BUILD_TAGS" >> $GITHUB_OUTPUT
 
       - name: Upload results to google sheets
         if: env.TEST_FAIL == 'FALSE' && (env.GITHUB_BRANCH == 'master' || env.GITHUB_BRANCH == 'dev')
@@ -360,6 +389,39 @@ jobs:
           name: ${{ env.BUILD_NAME }}_results
           path: ${{ runner.workspace }}/nmos-testing/results
     
+
+  docker-buildx-arm64-publish:
+    needs: docker-buildx-test-publish
+    if: needs.docker-buildx-test-publish.outputs.amd64-digest != ''
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v6
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Docker Buildx arm64 image, and publish it with the tested x86 image as multi-arch tags to Docker Hub
+        shell: bash
+        env:
+          DOCKER_IMAGE_NAME: ${{ secrets.Docker_Image_Name || 'rhastie/nmos-cpp' }}
+          DOCKERHUB_USERNAME: ${{ secrets.DockerHub_User }}
+          DOCKERHUB_PASSWORD: ${{ secrets.DockerHub_Password }}
+          AMD64_DIGEST: ${{ needs.docker-buildx-test-publish.outputs.amd64-digest }}
+          BUILD_TAGS: ${{ needs.docker-buildx-test-publish.outputs.tags }}
+        run: |
+          printf '%s' "$DOCKERHUB_PASSWORD" | docker login --username "$DOCKERHUB_USERNAME" --password-stdin
+          docker buildx build --platform linux/arm64 --build-arg makemt=3 \
+            --output "type=image,name=$DOCKER_IMAGE_NAME,push-by-digest=true,name-canonical=true,push=true" \
+            --metadata-file "$RUNNER_TEMP/metadata.json" .
+          arm64_digest=$(jq -er '."containerimage.digest"' "$RUNNER_TEMP/metadata.json")
+          tags=()
+          IFS=, read -ra build_tags <<< "$BUILD_TAGS"
+          for tag in "${build_tags[@]}"; do
+            tags+=(--tag "$DOCKER_IMAGE_NAME:$tag")
+          done
+          docker buildx imagetools create "${tags[@]}" \
+            "$DOCKER_IMAGE_NAME@$AMD64_DIGEST" "$DOCKER_IMAGE_NAME@$arm64_digest"
 
   make-badges:
     if: github.ref == 'refs/heads/master' && github.event_name == 'push'

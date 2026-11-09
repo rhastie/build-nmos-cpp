@@ -123,9 +123,11 @@ The NVIDIA NMOS docker container even though it is continuously being developed 
 
 - latest - Will always map to the very latest formally released version of the container.
 - 1.XY-CCCCCCC - Where X is a number, Y is a letter and C is a nmos-cpp commit reference - Mulit-arch, formal release that has been published post testing. These versions will be preserved as long as Docker Hub allows
-- dev-CCCCCCC - Where C is a nmos-cpp commit reference - None multi-arch, dev branch testing - This version should not be relied upon and can be removed without notice.
-- master-CCCCCCC - Where C is a nmos-cpp commit reference - None multi-arch, master branch testing - This version should not be relied upon can be removed without notice.
+- dev-CCCCCCC - Where C is a nmos-cpp commit reference - Multi-arch, dev branch testing - This version should not be relied upon and can be removed without notice.
+- master-CCCCCCC - Where C is a nmos-cpp commit reference - Multi-arch, master branch testing - This version should not be relied upon can be removed without notice.
 - 0.1X - Where X is a letter - Legacy versions of the container before it was formally released.
+
+The optional NMOS Bridge adapter image is published to [Docker Hub](https://hub.docker.com/r/rhastie/nmos-bridge-adapter/tags?page=1&ordering=last_updated) from the same branches, as `dev-CCCCCCC` and `master-CCCCCCC`, where C is a nmos-js commit reference, and as `latest` alongside the container. These tags are multi-arch.
 
 In addition to Docker Hub we also maintain an aligned set of release pacakges on GitHub - [NVIDIA NMOS Docker container releases](https://github.com/rhastie/build-nmos-cpp/releases)
 
@@ -274,3 +276,18 @@ make build
 make buildnode
 ```
 Please note the container will be built with a "-node" suffix applied to remove any confusion.
+
+### Building the NMOS Bridge adapter
+
+The optional `bridge-adapter` target packages the NMOS Bridge adapter from the same nmos-js commit as the browser UI, on the official `node:22-alpine` image. The adapter generates Envoy configuration from the Registry's Query API, so that a browser can reach the APIs of registered Nodes and Devices through Envoy without direct network access to them.
+
+- Make sure you have a fully functioning Docker CE environment. It is recommended you follow [the instructions for Ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
+- Clone this repository to your host
+- Run:
+
+```sh
+make buildbridge-adapter
+```
+The image is built as `nmos-bridge-adapter:CCCCCCC`, where C is the nmos-js commit reference. Set `BRIDGE_ADAPTER_IMAGE` to use a different image name.
+
+At runtime, set `REGISTRY_QUERY_URL` to the Registry's Query API, for example `http://registry/x-nmos/query/v1.3`. Run the adapter alongside Envoy, sharing `/etc/envoy/dynamic`, which the adapter writes and Envoy reads. For the optional settings, such as `APP_URL` to have Envoy also serve the browser UI, see the [nmos-bridge README](https://github.com/sony/nmos-js/tree/master/nmos-bridge) in nmos-js.

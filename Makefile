@@ -1,10 +1,14 @@
 NAME = nmos-cpp
-# grab the abrev commit SHA from Dockerfile
+# grab the short commit SHA from Dockerfile
 VERSION = 1.2A-$(shell sed -n 's/.*NMOS_CPP_VERSION=\(.......\).*/\1/p' Dockerfile)
 # Get number of processors available and add 1
 NPROC = $(shell echo $(shell nproc)+1 | bc)
 
-.PHONY: all version build run save test tag_latest clean-docker-stopped-containers clean-docker-untagged-images
+# grab the short nmos-js commit SHA from Dockerfile
+BRIDGE_VERSION = $(shell sed -n 's/.*NMOS_JS_VERSION=\(.......\).*/\1/p' Dockerfile)
+BRIDGE_ADAPTER_IMAGE ?= nmos-bridge-adapter
+
+.PHONY: all version build run save test tag_latest clean-docker-stopped-containers clean-docker-untagged-images buildbridge-adapter
 
 all: build
 
@@ -16,6 +20,9 @@ build: version
 
 buildnode: version
 	docker build -t $(NAME)-node:$(VERSION) --build-arg makemt=$(NPROC) --build-arg runnode=TRUE .
+
+buildbridge-adapter:
+	docker build --target bridge-adapter -t $(BRIDGE_ADAPTER_IMAGE):$(BRIDGE_VERSION) .
 
 buildx: version
 	docker buildx build --platform linux/amd64,linux/arm64 -t rhastie/$(NAME):$(VERSION) --build-arg makemt=$(NPROC) --push .
